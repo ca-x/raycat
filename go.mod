@@ -1,4 +1,4 @@
-module rayant
+module raycat
 
 go 1.23
 
