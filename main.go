@@ -20,7 +20,8 @@ func main() {
 // app implements the main component, the entry point to a Service Weaver app.
 type app struct {
 	weaver.Implements[weaver.Main]
-	lis weaver.Listener `weaver:"lis"`
+	fileSub weaver.Ref[subFileSourceProvider]
+	lis     weaver.Listener `weaver:"lis"`
 }
 
 // serve serves HTTP traffic.

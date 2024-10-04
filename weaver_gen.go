@@ -5,8 +5,11 @@ package main
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"github.com/ServiceWeaver/weaver"
 	"github.com/ServiceWeaver/weaver/runtime/codegen"
+	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 	"reflect"
 )
@@ -27,15 +30,35 @@ func init() {
 		ReflectStubFn: func(caller func(string, context.Context, []any, []any) error) any {
 			return main_reflect_stub{caller: caller}
 		},
-		RefData: "⟦d535aefb:wEaVeRlIsTeNeRs:github.com/ServiceWeaver/weaver/Main→lis⟧\n",
+		RefData: "⟦58ef135f:wEaVeReDgE:github.com/ServiceWeaver/weaver/Main→raycat/subFileSourceProvider⟧\n⟦d535aefb:wEaVeRlIsTeNeRs:github.com/ServiceWeaver/weaver/Main→lis⟧\n",
+	})
+	codegen.Register(codegen.Registration{
+		Name:  "raycat/subFileSourceProvider",
+		Iface: reflect.TypeOf((*subFileSourceProvider)(nil)).Elem(),
+		Impl:  reflect.TypeOf(subFileSource{}),
+		LocalStubFn: func(impl any, caller string, tracer trace.Tracer) any {
+			return subFileSourceProvider_local_stub{impl: impl.(subFileSourceProvider), tracer: tracer, updateSubMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "raycat/subFileSourceProvider", Method: "UpdateSub", Remote: false, Generated: true})}
+		},
+		ClientStubFn: func(stub codegen.Stub, caller string) any {
+			return subFileSourceProvider_client_stub{stub: stub, updateSubMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "raycat/subFileSourceProvider", Method: "UpdateSub", Remote: true, Generated: true})}
+		},
+		ServerStubFn: func(impl any, addLoad func(uint64, float64)) codegen.Server {
+			return subFileSourceProvider_server_stub{impl: impl.(subFileSourceProvider), addLoad: addLoad}
+		},
+		ReflectStubFn: func(caller func(string, context.Context, []any, []any) error) any {
+			return subFileSourceProvider_reflect_stub{caller: caller}
+		},
+		RefData: "",
 	})
 }
 
 // weaver.InstanceOf checks.
 var _ weaver.InstanceOf[weaver.Main] = (*app)(nil)
+var _ weaver.InstanceOf[subFileSourceProvider] = (*subFileSource)(nil)
 
 // weaver.Router checks.
 var _ weaver.Unrouted = (*app)(nil)
+var _ weaver.Unrouted = (*subFileSource)(nil)
 
 // Local stub implementations.
 
@@ -47,6 +70,35 @@ type main_local_stub struct {
 // Check that main_local_stub implements the weaver.Main interface.
 var _ weaver.Main = (*main_local_stub)(nil)
 
+type subFileSourceProvider_local_stub struct {
+	impl             subFileSourceProvider
+	tracer           trace.Tracer
+	updateSubMetrics *codegen.MethodMetrics
+}
+
+// Check that subFileSourceProvider_local_stub implements the subFileSourceProvider interface.
+var _ subFileSourceProvider = (*subFileSourceProvider_local_stub)(nil)
+
+func (s subFileSourceProvider_local_stub) UpdateSub(ctx context.Context) (r0 []byte, err error) {
+	// Update metrics.
+	begin := s.updateSubMetrics.Begin()
+	defer func() { s.updateSubMetrics.End(begin, err != nil, 0, 0) }()
+	span := trace.SpanFromContext(ctx)
+	if span.SpanContext().IsValid() {
+		// Create a child span for this method.
+		ctx, span = s.tracer.Start(ctx, "main.subFileSourceProvider.UpdateSub", trace.WithSpanKind(trace.SpanKindInternal))
+		defer func() {
+			if err != nil {
+				span.RecordError(err)
+				span.SetStatus(codes.Error, err.Error())
+			}
+			span.End()
+		}()
+	}
+
+	return s.impl.UpdateSub(ctx)
+}
+
 // Client stub implementations.
 
 type main_client_stub struct {
@@ -55,6 +107,61 @@ type main_client_stub struct {
 
 // Check that main_client_stub implements the weaver.Main interface.
 var _ weaver.Main = (*main_client_stub)(nil)
+
+type subFileSourceProvider_client_stub struct {
+	stub             codegen.Stub
+	updateSubMetrics *codegen.MethodMetrics
+}
+
+// Check that subFileSourceProvider_client_stub implements the subFileSourceProvider interface.
+var _ subFileSourceProvider = (*subFileSourceProvider_client_stub)(nil)
+
+func (s subFileSourceProvider_client_stub) UpdateSub(ctx context.Context) (r0 []byte, err error) {
+	// Update metrics.
+	var requestBytes, replyBytes int
+	begin := s.updateSubMetrics.Begin()
+	defer func() { s.updateSubMetrics.End(begin, err != nil, requestBytes, replyBytes) }()
+
+	span := trace.SpanFromContext(ctx)
+	if span.SpanContext().IsValid() {
+		// Create a child span for this method.
+		ctx, span = s.stub.Tracer().Start(ctx, "main.subFileSourceProvider.UpdateSub", trace.WithSpanKind(trace.SpanKindClient))
+	}
+
+	defer func() {
+		// Catch and return any panics detected during encoding/decoding/rpc.
+		if err == nil {
+			err = codegen.CatchPanics(recover())
+			if err != nil {
+				err = errors.Join(weaver.RemoteCallError, err)
+			}
+		}
+
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
+		}
+		span.End()
+
+	}()
+
+	var shardKey uint64
+
+	// Call the remote method.
+	var results []byte
+	results, err = s.stub.Run(ctx, 0, nil, shardKey)
+	replyBytes = len(results)
+	if err != nil {
+		err = errors.Join(weaver.RemoteCallError, err)
+		return
+	}
+
+	// Decode the results.
+	dec := codegen.NewDecoder(results)
+	r0 = serviceweaver_dec_slice_byte_87461245(dec)
+	err = dec.Error()
+	return
+}
 
 // Note that "weaver generate" will always generate the error message below.
 // Everything is okay. The error message is only relevant if you see it when
@@ -97,6 +204,44 @@ func (s main_server_stub) GetStubFn(method string) func(ctx context.Context, arg
 	}
 }
 
+type subFileSourceProvider_server_stub struct {
+	impl    subFileSourceProvider
+	addLoad func(key uint64, load float64)
+}
+
+// Check that subFileSourceProvider_server_stub implements the codegen.Server interface.
+var _ codegen.Server = (*subFileSourceProvider_server_stub)(nil)
+
+// GetStubFn implements the codegen.Server interface.
+func (s subFileSourceProvider_server_stub) GetStubFn(method string) func(ctx context.Context, args []byte) ([]byte, error) {
+	switch method {
+	case "UpdateSub":
+		return s.updateSub
+	default:
+		return nil
+	}
+}
+
+func (s subFileSourceProvider_server_stub) updateSub(ctx context.Context, args []byte) (res []byte, err error) {
+	// Catch and return any panics detected during encoding/decoding/rpc.
+	defer func() {
+		if err == nil {
+			err = codegen.CatchPanics(recover())
+		}
+	}()
+
+	// TODO(rgrandl): The deferred function above will recover from panics in the
+	// user code: fix this.
+	// Call the local method.
+	r0, appErr := s.impl.UpdateSub(ctx)
+
+	// Encode the results.
+	enc := codegen.NewEncoder()
+	serviceweaver_enc_slice_byte_87461245(enc, r0)
+	enc.Error(appErr)
+	return enc.Data(), nil
+}
+
 // Reflect stub implementations.
 
 type main_reflect_stub struct {
@@ -106,3 +251,64 @@ type main_reflect_stub struct {
 // Check that main_reflect_stub implements the weaver.Main interface.
 var _ weaver.Main = (*main_reflect_stub)(nil)
 
+type subFileSourceProvider_reflect_stub struct {
+	caller func(string, context.Context, []any, []any) error
+}
+
+// Check that subFileSourceProvider_reflect_stub implements the subFileSourceProvider interface.
+var _ subFileSourceProvider = (*subFileSourceProvider_reflect_stub)(nil)
+
+func (s subFileSourceProvider_reflect_stub) UpdateSub(ctx context.Context) (r0 []byte, err error) {
+	err = s.caller("UpdateSub", ctx, []any{}, []any{&r0})
+	return
+}
+
+// AutoMarshal implementations.
+
+var _ codegen.AutoMarshal = (*subFileSourceConfig)(nil)
+
+type __is_subFileSourceConfig[T ~struct {
+	weaver.AutoMarshal
+	Dir string "toml:\"dir\""
+}] struct{}
+
+var _ __is_subFileSourceConfig[subFileSourceConfig]
+
+func (x *subFileSourceConfig) WeaverMarshal(enc *codegen.Encoder) {
+	if x == nil {
+		panic(fmt.Errorf("subFileSourceConfig.WeaverMarshal: nil receiver"))
+	}
+	enc.String(x.Dir)
+}
+
+func (x *subFileSourceConfig) WeaverUnmarshal(dec *codegen.Decoder) {
+	if x == nil {
+		panic(fmt.Errorf("subFileSourceConfig.WeaverUnmarshal: nil receiver"))
+	}
+	x.Dir = dec.String()
+}
+
+// Encoding/decoding implementations.
+
+func serviceweaver_enc_slice_byte_87461245(enc *codegen.Encoder, arg []byte) {
+	if arg == nil {
+		enc.Len(-1)
+		return
+	}
+	enc.Len(len(arg))
+	for i := 0; i < len(arg); i++ {
+		enc.Byte(arg[i])
+	}
+}
+
+func serviceweaver_dec_slice_byte_87461245(dec *codegen.Decoder) []byte {
+	n := dec.Len()
+	if n == -1 {
+		return nil
+	}
+	res := make([]byte, n)
+	for i := 0; i < n; i++ {
+		res[i] = dec.Byte()
+	}
+	return res
+}
