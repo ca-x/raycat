@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"io"
 	"log"
 	"net/http"
@@ -39,7 +40,9 @@ func subShareHandlerApp(app *app) func(w http.ResponseWriter, _ *http.Request) {
 		return nil
 	}
 	return func(w http.ResponseWriter, _ *http.Request) {
-		_, err = io.Copy(w, bytes.NewReader(fileSub))
+		encoder := base64.NewEncoder(base64.StdEncoding, w)
+		defer encoder.Close()
+		_, err = io.Copy(encoder, bytes.NewReader(fileSub))
 		if err != nil {
 			app.Logger(context.Background()).Error("failed to copy file sub to http response", "error", err)
 		}
