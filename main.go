@@ -51,6 +51,7 @@ func subShareHandlerApp(app *app) func(w http.ResponseWriter, _ *http.Request) {
 	return func(w http.ResponseWriter, _ *http.Request) {
 		encoder := base64.NewEncoder(base64.StdEncoding, w)
 		defer encoder.Close()
+
 		buf := bufPool.Get()
 		defer bufPool.Free(buf)
 

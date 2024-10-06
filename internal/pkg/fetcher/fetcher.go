@@ -29,14 +29,16 @@ func (c *Client) Fetch(baseUrl string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	if isBase64(resp.Body()) {
-		payload, err := base64.StdEncoding.DecodeString(string(resp.Body()))
-		if err != nil {
-			return nil, err
-		}
-		return payload, nil
+	if !isBase64(resp.Body()) {
+		return resp.Body(), nil
 	}
-	return resp.Body(), nil
+	decodeLen := base64.StdEncoding.EncodedLen(len(resp.Body()))
+	decoded := make([]byte, decodeLen)
+	n, err := base64.StdEncoding.Decode(decoded, resp.Body())
+	if err != nil {
+		return nil, err
+	}
+	return decoded[:n], nil
 }
 
 func isBase64(data []byte) bool {
