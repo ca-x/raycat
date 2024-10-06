@@ -5,7 +5,9 @@ import (
 	"errors"
 	"github.com/ServiceWeaver/weaver"
 	"github.com/hashicorp/golang-lru/v2/expirable"
+
 	"raycat/internal/pkg/readkit"
+	"raycat/internal/pkg/tinypool"
 	"time"
 )
 
@@ -17,6 +19,7 @@ var (
 
 var (
 	fileSubLru = expirable.NewLRU[string, []byte](10, nil, time.Hour*24)
+	fileBuf    = tinypool.New(tinypool.BufReset)
 )
 
 type subFileSourceConfig struct {
@@ -25,7 +28,7 @@ type subFileSourceConfig struct {
 }
 
 type subFileSourceProvider interface {
-	UpdateSub(ctx context.Context) ([]byte, error)
+	UpdateFileSub(ctx context.Context) ([]byte, error)
 }
 
 type subFileSource struct {
@@ -33,15 +36,18 @@ type subFileSource struct {
 	weaver.WithConfig[subFileSourceConfig]
 }
 
-func (s *subFileSource) UpdateSub(ctx context.Context) ([]byte, error) {
+func (s *subFileSource) UpdateFileSub(ctx context.Context) ([]byte, error) {
 	if len(s.Config().FilePaths) == 0 {
 		s.Logger(ctx).Warn("skip file source,for dir was not config")
 		return nil, subFileSourceDirNotConfiguredError
 	}
-	allFileSubs := make([]byte, 0, 1024)
+	buf := fileBuf.Get()
+	defer fileBuf.Free(buf)
 	for _, path := range s.Config().FilePaths {
 		if content, found := fileSubLru.Get(path); found {
-			allFileSubs = append(allFileSubs, content...)
+			if _, err := buf.Write(content); err != nil {
+				s.Logger(context.Background()).Error("write buffered content to buf", "path", path, "err", err)
+			}
 			continue
 		}
 		content, err := readkit.ReadAll(path)
@@ -50,7 +56,10 @@ func (s *subFileSource) UpdateSub(ctx context.Context) ([]byte, error) {
 			return nil, err
 		}
 		fileSubLru.Add(path, content)
-		allFileSubs = append(allFileSubs, content...)
+		if _, err = buf.Write(content); err != nil {
+			s.Logger(context.Background()).Error("write read content to buf", "path", path, "err", err)
+		}
 	}
-	return allFileSubs, nil
+	b := buf.Bytes()
+	return b, nil
 }

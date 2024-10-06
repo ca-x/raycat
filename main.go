@@ -7,11 +7,16 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"raycat/internal/pkg/tinypool"
 
 	"github.com/ServiceWeaver/weaver"
 )
 
 //go:generate weaver generate ./...
+
+var (
+	bufPool = tinypool.New[bytes.Buffer](tinypool.BufReset)
+)
 
 func main() {
 	if err := weaver.Run(context.Background(), serve); err != nil {
@@ -23,6 +28,7 @@ func main() {
 type app struct {
 	weaver.Implements[weaver.Main]
 	fileSub weaver.Ref[subFileSourceProvider]
+	urlSub  weaver.Ref[subURLSourceProvider]
 	lis     weaver.Listener `weaver:"lis"`
 }
 
@@ -34,17 +40,35 @@ func serve(ctx context.Context, app *app) error {
 }
 
 func subShareHandlerApp(app *app) func(w http.ResponseWriter, _ *http.Request) {
-	fileSub, err := app.fileSub.Get().UpdateSub(context.Background())
+	fileSub, err := app.fileSub.Get().UpdateFileSub(context.Background())
 	if err != nil {
 		app.Logger(context.Background()).Error("failed to get file sub update", "error", err)
-		return nil
+	}
+	urlSub, err := app.urlSub.Get().UpdateUrlSub(context.Background())
+	if err != nil {
+		app.Logger(context.Background()).Error("failed to get url sub update", "error", err)
 	}
 	return func(w http.ResponseWriter, _ *http.Request) {
 		encoder := base64.NewEncoder(base64.StdEncoding, w)
 		defer encoder.Close()
-		_, err = io.Copy(encoder, bytes.NewReader(fileSub))
+		buf := bufPool.Get()
+		defer bufPool.Free(buf)
+
+		if len(fileSub) > 0 {
+			if _, err = buf.Write(fileSub); err != nil {
+				app.Logger(context.Background()).Error("failed to write file sub to buffer", "error", err)
+			}
+		}
+
+		if len(urlSub) > 0 {
+			if _, err = buf.Write(urlSub); err != nil {
+				app.Logger(context.Background()).Error("failed to write url sub to buffer", "error", err)
+			}
+		}
+
+		_, err = io.Copy(encoder, buf)
 		if err != nil {
-			app.Logger(context.Background()).Error("failed to copy file sub to http response", "error", err)
+			app.Logger(context.Background()).Error("failed to copy file to http response", "error", err)
 		}
 	}
 }
