@@ -1,8 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"context"
-	"fmt"
+	"io"
 	"log"
 	"net/http"
 
@@ -26,11 +27,21 @@ type app struct {
 
 // serve serves HTTP traffic.
 func serve(ctx context.Context, app *app) error {
-	http.HandleFunc("/x", subShareHandler)
+	http.HandleFunc("/x", subShareHandlerApp(app))
 	app.Logger(ctx).Info("Listening on...", "address", app.lis)
 	return http.Serve(app.lis, nil)
 }
 
-func subShareHandler(w http.ResponseWriter, _ *http.Request) {
-	fmt.Fprintln(w, "Hello, World!")
+func subShareHandlerApp(app *app) func(w http.ResponseWriter, _ *http.Request) {
+	fileSub, err := app.fileSub.Get().UpdateSub(context.Background())
+	if err != nil {
+		app.Logger(context.Background()).Error("failed to get file sub update", "error", err)
+		return nil
+	}
+	return func(w http.ResponseWriter, _ *http.Request) {
+		_, err = io.Copy(w, bytes.NewReader(fileSub))
+		if err != nil {
+			app.Logger(context.Background()).Error("failed to copy file sub to http response", "error", err)
+		}
+	}
 }

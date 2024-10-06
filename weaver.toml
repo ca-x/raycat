@@ -6,13 +6,17 @@
 # basics of an application, including the binary to run, the command line
 # arguments to pass, and the environment variables to set.
 [serviceweaver]
-binary = "rayant"
+binary = "raycat"
 # args = ["put", "command", "line", "arguments", "here"]
 # env = ["PUT=foo", "ENV=bar", "VARS=baz", "HERE="]
 
 # The [single] section configures the behavior of the app when deployed via
 # `weaver single deploy`. See serviceweaver.dev/docs.html#single-process for
 # more information about the single process deployer.
+
+["raycat/subFileSourceProvider"]
+file_paths=["sss","yyyy"]
+
 [single]
 listeners.lis = {address="localhost:9000"}
 

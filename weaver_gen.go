@@ -269,7 +269,7 @@ var _ codegen.AutoMarshal = (*subFileSourceConfig)(nil)
 
 type __is_subFileSourceConfig[T ~struct {
 	weaver.AutoMarshal
-	Dir string "toml:\"dir\""
+	FilePaths []string "toml:\"file_paths\""
 }] struct{}
 
 var _ __is_subFileSourceConfig[subFileSourceConfig]
@@ -278,14 +278,37 @@ func (x *subFileSourceConfig) WeaverMarshal(enc *codegen.Encoder) {
 	if x == nil {
 		panic(fmt.Errorf("subFileSourceConfig.WeaverMarshal: nil receiver"))
 	}
-	enc.String(x.Dir)
+	serviceweaver_enc_slice_string_4af10117(enc, x.FilePaths)
 }
 
 func (x *subFileSourceConfig) WeaverUnmarshal(dec *codegen.Decoder) {
 	if x == nil {
 		panic(fmt.Errorf("subFileSourceConfig.WeaverUnmarshal: nil receiver"))
 	}
-	x.Dir = dec.String()
+	x.FilePaths = serviceweaver_dec_slice_string_4af10117(dec)
+}
+
+func serviceweaver_enc_slice_string_4af10117(enc *codegen.Encoder, arg []string) {
+	if arg == nil {
+		enc.Len(-1)
+		return
+	}
+	enc.Len(len(arg))
+	for i := 0; i < len(arg); i++ {
+		enc.String(arg[i])
+	}
+}
+
+func serviceweaver_dec_slice_string_4af10117(dec *codegen.Decoder) []string {
+	n := dec.Len()
+	if n == -1 {
+		return nil
+	}
+	res := make([]string, n)
+	for i := 0; i < n; i++ {
+		res[i] = dec.String()
+	}
+	return res
 }
 
 // Encoding/decoding implementations.
