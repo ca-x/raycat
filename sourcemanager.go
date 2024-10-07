@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	_ "modernc.org/sqlite"
 	"raycat/internal/ent"
+	"raycat/internal/ent/subscribe"
 	"time"
 )
 
@@ -15,7 +16,7 @@ type SubscribeEntry struct {
 	weaver.AutoMarshal
 	ID uuid.UUID
 	// Kind holds the value of the "kind" field.
-	Kind int
+	Kind subscribe.Kind
 	// Location holds the value of the "location" field.
 	Location string
 	// UpdateTimeoutSeconds holds the value of the "update_timeout_seconds" field.
@@ -37,7 +38,7 @@ type subSourceManageProvider interface {
 	// UpdateOneSubSource update one sub source by its uuid
 	UpdateOneSubSource(ctx context.Context, id uuid.UUID, updateEntry *SubscribeEntry) error
 	// GetAllSubSourcesByKind  get all sub source by its kind
-	GetAllSubSourcesByKind(ctx context.Context, kind int) ([]*SubscribeEntry, error)
+	GetAllSubSourcesByKind(ctx context.Context, kind subscribe.Kind) ([]*SubscribeEntry, error)
 	// GetAllSubSources get all sub sources
 	GetAllSubSources(ctx context.Context) ([]*SubscribeEntry, error)
 }
@@ -92,7 +93,7 @@ func (s *subSourceManager) UpdateOneSubSource(ctx context.Context, id uuid.UUID,
 		Exec(ctx)
 }
 
-func (s *subSourceManager) GetAllSubSourcesByKind(ctx context.Context, kind int) ([]*SubscribeEntry, error) {
+func (s *subSourceManager) GetAllSubSourcesByKind(ctx context.Context, kind subscribe.Kind) ([]*SubscribeEntry, error) {
 	//TODO implement me
 	panic("implement me")
 }

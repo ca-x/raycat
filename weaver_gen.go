@@ -12,6 +12,7 @@ import (
 	"github.com/google/uuid"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
+	"raycat/internal/ent/subscribe"
 	"reflect"
 	"time"
 )
@@ -32,7 +33,7 @@ func init() {
 		ReflectStubFn: func(caller func(string, context.Context, []any, []any) error) any {
 			return main_reflect_stub{caller: caller}
 		},
-		RefData: "⟦58ef135f:wEaVeReDgE:github.com/ServiceWeaver/weaver/Main→raycat/subFileSourceProvider⟧\n⟦06ebe5e4:wEaVeReDgE:github.com/ServiceWeaver/weaver/Main→raycat/subURLSourceProvider⟧\n⟦58ef135f:wEaVeReDgE:github.com/ServiceWeaver/weaver/Main→raycat/subFileSourceProvider⟧\n⟦d535aefb:wEaVeRlIsTeNeRs:github.com/ServiceWeaver/weaver/Main→lis⟧\n",
+		RefData: "⟦58ef135f:wEaVeReDgE:github.com/ServiceWeaver/weaver/Main→raycat/subFileSourceProvider⟧\n⟦06ebe5e4:wEaVeReDgE:github.com/ServiceWeaver/weaver/Main→raycat/subURLSourceProvider⟧\n⟦738ef79c:wEaVeReDgE:github.com/ServiceWeaver/weaver/Main→raycat/subSourceManageProvider⟧\n⟦d535aefb:wEaVeRlIsTeNeRs:github.com/ServiceWeaver/weaver/Main→lis⟧\n",
 	})
 	codegen.Register(codegen.Registration{
 		Name:  "raycat/subFileSourceProvider",
@@ -235,7 +236,7 @@ func (s subSourceManageProvider_local_stub) GetAllSubSources(ctx context.Context
 	return s.impl.GetAllSubSources(ctx)
 }
 
-func (s subSourceManageProvider_local_stub) GetAllSubSourcesByKind(ctx context.Context, a0 int) (r0 []*SubscribeEntry, err error) {
+func (s subSourceManageProvider_local_stub) GetAllSubSourcesByKind(ctx context.Context, a0 subscribe.Kind) (r0 []*SubscribeEntry, err error) {
 	// Update metrics.
 	begin := s.getAllSubSourcesByKindMetrics.Begin()
 	defer func() { s.getAllSubSourcesByKindMetrics.End(begin, err != nil, 0, 0) }()
@@ -583,7 +584,7 @@ func (s subSourceManageProvider_client_stub) GetAllSubSources(ctx context.Contex
 	return
 }
 
-func (s subSourceManageProvider_client_stub) GetAllSubSourcesByKind(ctx context.Context, a0 int) (r0 []*SubscribeEntry, err error) {
+func (s subSourceManageProvider_client_stub) GetAllSubSourcesByKind(ctx context.Context, a0 subscribe.Kind) (r0 []*SubscribeEntry, err error) {
 	// Update metrics.
 	var requestBytes, replyBytes int
 	begin := s.getAllSubSourcesByKindMetrics.Begin()
@@ -612,14 +613,9 @@ func (s subSourceManageProvider_client_stub) GetAllSubSourcesByKind(ctx context.
 
 	}()
 
-	// Preallocate a buffer of the right size.
-	size := 0
-	size += 8
-	enc := codegen.NewEncoder()
-	enc.Reset(size)
-
 	// Encode arguments.
-	enc.Int(a0)
+	enc := codegen.NewEncoder()
+	enc.String((string)(a0))
 	var shardKey uint64
 
 	// Call the remote method.
@@ -965,8 +961,8 @@ func (s subSourceManageProvider_server_stub) getAllSubSourcesByKind(ctx context.
 
 	// Decode arguments.
 	dec := codegen.NewDecoder(args)
-	var a0 int
-	a0 = dec.Int()
+	var a0 subscribe.Kind
+	*(*string)(&a0) = dec.String()
 
 	// TODO(rgrandl): The deferred function above will recover from panics in the
 	// user code: fix this.
@@ -1099,7 +1095,7 @@ func (s subSourceManageProvider_reflect_stub) GetAllSubSources(ctx context.Conte
 	return
 }
 
-func (s subSourceManageProvider_reflect_stub) GetAllSubSourcesByKind(ctx context.Context, a0 int) (r0 []*SubscribeEntry, err error) {
+func (s subSourceManageProvider_reflect_stub) GetAllSubSourcesByKind(ctx context.Context, a0 subscribe.Kind) (r0 []*SubscribeEntry, err error) {
 	err = s.caller("GetAllSubSourcesByKind", ctx, []any{a0}, []any{&r0})
 	return
 }
@@ -1128,7 +1124,7 @@ var _ codegen.AutoMarshal = (*SubscribeEntry)(nil)
 type __is_SubscribeEntry[T ~struct {
 	weaver.AutoMarshal
 	ID                   uuid.UUID
-	Kind                 int
+	Kind                 subscribe.Kind
 	Location             string
 	UpdateTimeoutSeconds int
 	Latency              int64
@@ -1143,7 +1139,7 @@ func (x *SubscribeEntry) WeaverMarshal(enc *codegen.Encoder) {
 		panic(fmt.Errorf("SubscribeEntry.WeaverMarshal: nil receiver"))
 	}
 	enc.EncodeBinaryMarshaler(&x.ID)
-	enc.Int(x.Kind)
+	enc.String((string)(x.Kind))
 	enc.String(x.Location)
 	enc.Int(x.UpdateTimeoutSeconds)
 	enc.Int64(x.Latency)
@@ -1156,7 +1152,7 @@ func (x *SubscribeEntry) WeaverUnmarshal(dec *codegen.Decoder) {
 		panic(fmt.Errorf("SubscribeEntry.WeaverUnmarshal: nil receiver"))
 	}
 	dec.DecodeBinaryUnmarshaler(&x.ID)
-	x.Kind = dec.Int()
+	*(*string)(&x.Kind) = dec.String()
 	x.Location = dec.String()
 	x.UpdateTimeoutSeconds = dec.Int()
 	x.Latency = dec.Int64()
