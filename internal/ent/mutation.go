@@ -31,20 +31,21 @@ const (
 // SubscribeMutation represents an operation that mutates the Subscribe nodes in the graph.
 type SubscribeMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *uuid.UUID
-	kind          *int
-	addkind       *int
-	location      *string
-	latency       *int64
-	addlatency    *int64
-	expire_at     *time.Time
-	created_at    *time.Time
-	clearedFields map[string]struct{}
-	done          bool
-	oldValue      func(context.Context) (*Subscribe, error)
-	predicates    []predicate.Subscribe
+	op                        Op
+	typ                       string
+	id                        *uuid.UUID
+	kind                      *subscribe.Kind
+	location                  *string
+	update_timeout_seconds    *int
+	addupdate_timeout_seconds *int
+	latency                   *int64
+	addlatency                *int64
+	expire_at                 *time.Time
+	created_at                *time.Time
+	clearedFields             map[string]struct{}
+	done                      bool
+	oldValue                  func(context.Context) (*Subscribe, error)
+	predicates                []predicate.Subscribe
 }
 
 var _ ent.Mutation = (*SubscribeMutation)(nil)
@@ -152,13 +153,12 @@ func (m *SubscribeMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 }
 
 // SetKind sets the "kind" field.
-func (m *SubscribeMutation) SetKind(i int) {
-	m.kind = &i
-	m.addkind = nil
+func (m *SubscribeMutation) SetKind(s subscribe.Kind) {
+	m.kind = &s
 }
 
 // Kind returns the value of the "kind" field in the mutation.
-func (m *SubscribeMutation) Kind() (r int, exists bool) {
+func (m *SubscribeMutation) Kind() (r subscribe.Kind, exists bool) {
 	v := m.kind
 	if v == nil {
 		return
@@ -169,7 +169,7 @@ func (m *SubscribeMutation) Kind() (r int, exists bool) {
 // OldKind returns the old "kind" field's value of the Subscribe entity.
 // If the Subscribe object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SubscribeMutation) OldKind(ctx context.Context) (v int, err error) {
+func (m *SubscribeMutation) OldKind(ctx context.Context) (v subscribe.Kind, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldKind is only allowed on UpdateOne operations")
 	}
@@ -183,28 +183,9 @@ func (m *SubscribeMutation) OldKind(ctx context.Context) (v int, err error) {
 	return oldValue.Kind, nil
 }
 
-// AddKind adds i to the "kind" field.
-func (m *SubscribeMutation) AddKind(i int) {
-	if m.addkind != nil {
-		*m.addkind += i
-	} else {
-		m.addkind = &i
-	}
-}
-
-// AddedKind returns the value that was added to the "kind" field in this mutation.
-func (m *SubscribeMutation) AddedKind() (r int, exists bool) {
-	v := m.addkind
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
 // ResetKind resets all changes to the "kind" field.
 func (m *SubscribeMutation) ResetKind() {
 	m.kind = nil
-	m.addkind = nil
 }
 
 // SetLocation sets the "location" field.
@@ -241,6 +222,62 @@ func (m *SubscribeMutation) OldLocation(ctx context.Context) (v string, err erro
 // ResetLocation resets all changes to the "location" field.
 func (m *SubscribeMutation) ResetLocation() {
 	m.location = nil
+}
+
+// SetUpdateTimeoutSeconds sets the "update_timeout_seconds" field.
+func (m *SubscribeMutation) SetUpdateTimeoutSeconds(i int) {
+	m.update_timeout_seconds = &i
+	m.addupdate_timeout_seconds = nil
+}
+
+// UpdateTimeoutSeconds returns the value of the "update_timeout_seconds" field in the mutation.
+func (m *SubscribeMutation) UpdateTimeoutSeconds() (r int, exists bool) {
+	v := m.update_timeout_seconds
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdateTimeoutSeconds returns the old "update_timeout_seconds" field's value of the Subscribe entity.
+// If the Subscribe object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubscribeMutation) OldUpdateTimeoutSeconds(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdateTimeoutSeconds is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdateTimeoutSeconds requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdateTimeoutSeconds: %w", err)
+	}
+	return oldValue.UpdateTimeoutSeconds, nil
+}
+
+// AddUpdateTimeoutSeconds adds i to the "update_timeout_seconds" field.
+func (m *SubscribeMutation) AddUpdateTimeoutSeconds(i int) {
+	if m.addupdate_timeout_seconds != nil {
+		*m.addupdate_timeout_seconds += i
+	} else {
+		m.addupdate_timeout_seconds = &i
+	}
+}
+
+// AddedUpdateTimeoutSeconds returns the value that was added to the "update_timeout_seconds" field in this mutation.
+func (m *SubscribeMutation) AddedUpdateTimeoutSeconds() (r int, exists bool) {
+	v := m.addupdate_timeout_seconds
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetUpdateTimeoutSeconds resets all changes to the "update_timeout_seconds" field.
+func (m *SubscribeMutation) ResetUpdateTimeoutSeconds() {
+	m.update_timeout_seconds = nil
+	m.addupdate_timeout_seconds = nil
 }
 
 // SetLatency sets the "latency" field.
@@ -405,12 +442,15 @@ func (m *SubscribeMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *SubscribeMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.kind != nil {
 		fields = append(fields, subscribe.FieldKind)
 	}
 	if m.location != nil {
 		fields = append(fields, subscribe.FieldLocation)
+	}
+	if m.update_timeout_seconds != nil {
+		fields = append(fields, subscribe.FieldUpdateTimeoutSeconds)
 	}
 	if m.latency != nil {
 		fields = append(fields, subscribe.FieldLatency)
@@ -433,6 +473,8 @@ func (m *SubscribeMutation) Field(name string) (ent.Value, bool) {
 		return m.Kind()
 	case subscribe.FieldLocation:
 		return m.Location()
+	case subscribe.FieldUpdateTimeoutSeconds:
+		return m.UpdateTimeoutSeconds()
 	case subscribe.FieldLatency:
 		return m.Latency()
 	case subscribe.FieldExpireAt:
@@ -452,6 +494,8 @@ func (m *SubscribeMutation) OldField(ctx context.Context, name string) (ent.Valu
 		return m.OldKind(ctx)
 	case subscribe.FieldLocation:
 		return m.OldLocation(ctx)
+	case subscribe.FieldUpdateTimeoutSeconds:
+		return m.OldUpdateTimeoutSeconds(ctx)
 	case subscribe.FieldLatency:
 		return m.OldLatency(ctx)
 	case subscribe.FieldExpireAt:
@@ -468,7 +512,7 @@ func (m *SubscribeMutation) OldField(ctx context.Context, name string) (ent.Valu
 func (m *SubscribeMutation) SetField(name string, value ent.Value) error {
 	switch name {
 	case subscribe.FieldKind:
-		v, ok := value.(int)
+		v, ok := value.(subscribe.Kind)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -480,6 +524,13 @@ func (m *SubscribeMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetLocation(v)
+		return nil
+	case subscribe.FieldUpdateTimeoutSeconds:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdateTimeoutSeconds(v)
 		return nil
 	case subscribe.FieldLatency:
 		v, ok := value.(int64)
@@ -510,8 +561,8 @@ func (m *SubscribeMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *SubscribeMutation) AddedFields() []string {
 	var fields []string
-	if m.addkind != nil {
-		fields = append(fields, subscribe.FieldKind)
+	if m.addupdate_timeout_seconds != nil {
+		fields = append(fields, subscribe.FieldUpdateTimeoutSeconds)
 	}
 	if m.addlatency != nil {
 		fields = append(fields, subscribe.FieldLatency)
@@ -524,8 +575,8 @@ func (m *SubscribeMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *SubscribeMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case subscribe.FieldKind:
-		return m.AddedKind()
+	case subscribe.FieldUpdateTimeoutSeconds:
+		return m.AddedUpdateTimeoutSeconds()
 	case subscribe.FieldLatency:
 		return m.AddedLatency()
 	}
@@ -537,12 +588,12 @@ func (m *SubscribeMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *SubscribeMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case subscribe.FieldKind:
+	case subscribe.FieldUpdateTimeoutSeconds:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddKind(v)
+		m.AddUpdateTimeoutSeconds(v)
 		return nil
 	case subscribe.FieldLatency:
 		v, ok := value.(int64)
@@ -583,6 +634,9 @@ func (m *SubscribeMutation) ResetField(name string) error {
 		return nil
 	case subscribe.FieldLocation:
 		m.ResetLocation()
+		return nil
+	case subscribe.FieldUpdateTimeoutSeconds:
+		m.ResetUpdateTimeoutSeconds()
 		return nil
 	case subscribe.FieldLatency:
 		m.ResetLatency()

@@ -15,17 +15,10 @@ binary = "raycat"
 # more information about the single process deployer.
 
 ["raycat/subFileSourceProvider"]
-file_paths = [
-    "sss",
-    "yyyy",
-]
+driver = "sqlite"
+conn_str = ""
 
-["raycat/subURLSourceProvider"]
-timeout_seconds = 2
-url_subs = [
-    "ssss",
-    "zzzz"
-]
+
 
 
 [single]

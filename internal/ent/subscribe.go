@@ -19,9 +19,11 @@ type Subscribe struct {
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
 	// Kind holds the value of the "kind" field.
-	Kind int `json:"kind,omitempty"`
+	Kind subscribe.Kind `json:"kind,omitempty"`
 	// Location holds the value of the "location" field.
 	Location string `json:"location,omitempty"`
+	// UpdateTimeoutSeconds holds the value of the "update_timeout_seconds" field.
+	UpdateTimeoutSeconds int `json:"update_timeout_seconds,omitempty"`
 	// Latency holds the value of the "latency" field.
 	Latency int64 `json:"latency,omitempty"`
 	// ExpireAt holds the value of the "expire_at" field.
@@ -36,9 +38,9 @@ func (*Subscribe) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case subscribe.FieldKind, subscribe.FieldLatency:
+		case subscribe.FieldUpdateTimeoutSeconds, subscribe.FieldLatency:
 			values[i] = new(sql.NullInt64)
-		case subscribe.FieldLocation:
+		case subscribe.FieldKind, subscribe.FieldLocation:
 			values[i] = new(sql.NullString)
 		case subscribe.FieldExpireAt, subscribe.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
@@ -66,16 +68,22 @@ func (s *Subscribe) assignValues(columns []string, values []any) error {
 				s.ID = *value
 			}
 		case subscribe.FieldKind:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
+			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field kind", values[i])
 			} else if value.Valid {
-				s.Kind = int(value.Int64)
+				s.Kind = subscribe.Kind(value.String)
 			}
 		case subscribe.FieldLocation:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field location", values[i])
 			} else if value.Valid {
 				s.Location = value.String
+			}
+		case subscribe.FieldUpdateTimeoutSeconds:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field update_timeout_seconds", values[i])
+			} else if value.Valid {
+				s.UpdateTimeoutSeconds = int(value.Int64)
 			}
 		case subscribe.FieldLatency:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -136,6 +144,9 @@ func (s *Subscribe) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("location=")
 	builder.WriteString(s.Location)
+	builder.WriteString(", ")
+	builder.WriteString("update_timeout_seconds=")
+	builder.WriteString(fmt.Sprintf("%v", s.UpdateTimeoutSeconds))
 	builder.WriteString(", ")
 	builder.WriteString("latency=")
 	builder.WriteString(fmt.Sprintf("%v", s.Latency))

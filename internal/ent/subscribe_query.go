@@ -263,7 +263,7 @@ func (sq *SubscribeQuery) Clone() *SubscribeQuery {
 // Example:
 //
 //	var v []struct {
-//		Kind int `json:"kind,omitempty"`
+//		Kind subscribe.Kind `json:"kind,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -286,7 +286,7 @@ func (sq *SubscribeQuery) GroupBy(field string, fields ...string) *SubscribeGrou
 // Example:
 //
 //	var v []struct {
-//		Kind int `json:"kind,omitempty"`
+//		Kind subscribe.Kind `json:"kind,omitempty"`
 //	}
 //
 //	client.Subscribe.Query().

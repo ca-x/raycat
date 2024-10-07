@@ -11,8 +11,9 @@ var (
 	// SubscribesColumns holds the columns for the "subscribes" table.
 	SubscribesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
-		{Name: "kind", Type: field.TypeInt},
+		{Name: "kind", Type: field.TypeEnum, Enums: []string{"url_sub", "local_sub", "tpl_sub", "sub_entry", "none"}, Default: "none"},
 		{Name: "location", Type: field.TypeString, Unique: true},
+		{Name: "update_timeout_seconds", Type: field.TypeInt, Default: 2},
 		{Name: "latency", Type: field.TypeInt64},
 		{Name: "expire_at", Type: field.TypeTime},
 		{Name: "created_at", Type: field.TypeTime},

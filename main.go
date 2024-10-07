@@ -29,6 +29,7 @@ type app struct {
 	weaver.Implements[weaver.Main]
 	fileSub weaver.Ref[subFileSourceProvider]
 	urlSub  weaver.Ref[subURLSourceProvider]
+	subMgm  weaver.Ref[subSourceManageProvider]
 	lis     weaver.Listener `weaver:"lis"`
 }
 
@@ -40,11 +41,12 @@ func serve(ctx context.Context, app *app) error {
 }
 
 func subShareHandlerApp(app *app) func(w http.ResponseWriter, _ *http.Request) {
-	fileSub, err := app.fileSub.Get().UpdateFileSub(context.Background())
+	app.subMgm.Get().GetAllSubSourcesByKind()
+	fileSub, err := app.fileSub.Get().UpdateFileSub(context.Background(), nil)
 	if err != nil {
 		app.Logger(context.Background()).Error("failed to get file sub update", "error", err)
 	}
-	urlSub, err := app.urlSub.Get().UpdateUrlSub(context.Background())
+	urlSub, err := app.urlSub.Get().UpdateUrlSub(context.Background(), nil, 0)
 	if err != nil {
 		app.Logger(context.Background()).Error("failed to get url sub update", "error", err)
 	}

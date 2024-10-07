@@ -29,23 +29,16 @@ func (su *SubscribeUpdate) Where(ps ...predicate.Subscribe) *SubscribeUpdate {
 }
 
 // SetKind sets the "kind" field.
-func (su *SubscribeUpdate) SetKind(i int) *SubscribeUpdate {
-	su.mutation.ResetKind()
-	su.mutation.SetKind(i)
+func (su *SubscribeUpdate) SetKind(s subscribe.Kind) *SubscribeUpdate {
+	su.mutation.SetKind(s)
 	return su
 }
 
 // SetNillableKind sets the "kind" field if the given value is not nil.
-func (su *SubscribeUpdate) SetNillableKind(i *int) *SubscribeUpdate {
-	if i != nil {
-		su.SetKind(*i)
+func (su *SubscribeUpdate) SetNillableKind(s *subscribe.Kind) *SubscribeUpdate {
+	if s != nil {
+		su.SetKind(*s)
 	}
-	return su
-}
-
-// AddKind adds i to the "kind" field.
-func (su *SubscribeUpdate) AddKind(i int) *SubscribeUpdate {
-	su.mutation.AddKind(i)
 	return su
 }
 
@@ -60,6 +53,27 @@ func (su *SubscribeUpdate) SetNillableLocation(s *string) *SubscribeUpdate {
 	if s != nil {
 		su.SetLocation(*s)
 	}
+	return su
+}
+
+// SetUpdateTimeoutSeconds sets the "update_timeout_seconds" field.
+func (su *SubscribeUpdate) SetUpdateTimeoutSeconds(i int) *SubscribeUpdate {
+	su.mutation.ResetUpdateTimeoutSeconds()
+	su.mutation.SetUpdateTimeoutSeconds(i)
+	return su
+}
+
+// SetNillableUpdateTimeoutSeconds sets the "update_timeout_seconds" field if the given value is not nil.
+func (su *SubscribeUpdate) SetNillableUpdateTimeoutSeconds(i *int) *SubscribeUpdate {
+	if i != nil {
+		su.SetUpdateTimeoutSeconds(*i)
+	}
+	return su
+}
+
+// AddUpdateTimeoutSeconds adds i to the "update_timeout_seconds" field.
+func (su *SubscribeUpdate) AddUpdateTimeoutSeconds(i int) *SubscribeUpdate {
+	su.mutation.AddUpdateTimeoutSeconds(i)
 	return su
 }
 
@@ -144,7 +158,20 @@ func (su *SubscribeUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (su *SubscribeUpdate) check() error {
+	if v, ok := su.mutation.Kind(); ok {
+		if err := subscribe.KindValidator(v); err != nil {
+			return &ValidationError{Name: "kind", err: fmt.Errorf(`ent: validator failed for field "Subscribe.kind": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (su *SubscribeUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := su.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(subscribe.Table, subscribe.Columns, sqlgraph.NewFieldSpec(subscribe.FieldID, field.TypeUUID))
 	if ps := su.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -154,13 +181,16 @@ func (su *SubscribeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 	}
 	if value, ok := su.mutation.Kind(); ok {
-		_spec.SetField(subscribe.FieldKind, field.TypeInt, value)
-	}
-	if value, ok := su.mutation.AddedKind(); ok {
-		_spec.AddField(subscribe.FieldKind, field.TypeInt, value)
+		_spec.SetField(subscribe.FieldKind, field.TypeEnum, value)
 	}
 	if value, ok := su.mutation.Location(); ok {
 		_spec.SetField(subscribe.FieldLocation, field.TypeString, value)
+	}
+	if value, ok := su.mutation.UpdateTimeoutSeconds(); ok {
+		_spec.SetField(subscribe.FieldUpdateTimeoutSeconds, field.TypeInt, value)
+	}
+	if value, ok := su.mutation.AddedUpdateTimeoutSeconds(); ok {
+		_spec.AddField(subscribe.FieldUpdateTimeoutSeconds, field.TypeInt, value)
 	}
 	if value, ok := su.mutation.Latency(); ok {
 		_spec.SetField(subscribe.FieldLatency, field.TypeInt64, value)
@@ -195,23 +225,16 @@ type SubscribeUpdateOne struct {
 }
 
 // SetKind sets the "kind" field.
-func (suo *SubscribeUpdateOne) SetKind(i int) *SubscribeUpdateOne {
-	suo.mutation.ResetKind()
-	suo.mutation.SetKind(i)
+func (suo *SubscribeUpdateOne) SetKind(s subscribe.Kind) *SubscribeUpdateOne {
+	suo.mutation.SetKind(s)
 	return suo
 }
 
 // SetNillableKind sets the "kind" field if the given value is not nil.
-func (suo *SubscribeUpdateOne) SetNillableKind(i *int) *SubscribeUpdateOne {
-	if i != nil {
-		suo.SetKind(*i)
+func (suo *SubscribeUpdateOne) SetNillableKind(s *subscribe.Kind) *SubscribeUpdateOne {
+	if s != nil {
+		suo.SetKind(*s)
 	}
-	return suo
-}
-
-// AddKind adds i to the "kind" field.
-func (suo *SubscribeUpdateOne) AddKind(i int) *SubscribeUpdateOne {
-	suo.mutation.AddKind(i)
 	return suo
 }
 
@@ -226,6 +249,27 @@ func (suo *SubscribeUpdateOne) SetNillableLocation(s *string) *SubscribeUpdateOn
 	if s != nil {
 		suo.SetLocation(*s)
 	}
+	return suo
+}
+
+// SetUpdateTimeoutSeconds sets the "update_timeout_seconds" field.
+func (suo *SubscribeUpdateOne) SetUpdateTimeoutSeconds(i int) *SubscribeUpdateOne {
+	suo.mutation.ResetUpdateTimeoutSeconds()
+	suo.mutation.SetUpdateTimeoutSeconds(i)
+	return suo
+}
+
+// SetNillableUpdateTimeoutSeconds sets the "update_timeout_seconds" field if the given value is not nil.
+func (suo *SubscribeUpdateOne) SetNillableUpdateTimeoutSeconds(i *int) *SubscribeUpdateOne {
+	if i != nil {
+		suo.SetUpdateTimeoutSeconds(*i)
+	}
+	return suo
+}
+
+// AddUpdateTimeoutSeconds adds i to the "update_timeout_seconds" field.
+func (suo *SubscribeUpdateOne) AddUpdateTimeoutSeconds(i int) *SubscribeUpdateOne {
+	suo.mutation.AddUpdateTimeoutSeconds(i)
 	return suo
 }
 
@@ -323,7 +367,20 @@ func (suo *SubscribeUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (suo *SubscribeUpdateOne) check() error {
+	if v, ok := suo.mutation.Kind(); ok {
+		if err := subscribe.KindValidator(v); err != nil {
+			return &ValidationError{Name: "kind", err: fmt.Errorf(`ent: validator failed for field "Subscribe.kind": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (suo *SubscribeUpdateOne) sqlSave(ctx context.Context) (_node *Subscribe, err error) {
+	if err := suo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(subscribe.Table, subscribe.Columns, sqlgraph.NewFieldSpec(subscribe.FieldID, field.TypeUUID))
 	id, ok := suo.mutation.ID()
 	if !ok {
@@ -350,13 +407,16 @@ func (suo *SubscribeUpdateOne) sqlSave(ctx context.Context) (_node *Subscribe, e
 		}
 	}
 	if value, ok := suo.mutation.Kind(); ok {
-		_spec.SetField(subscribe.FieldKind, field.TypeInt, value)
-	}
-	if value, ok := suo.mutation.AddedKind(); ok {
-		_spec.AddField(subscribe.FieldKind, field.TypeInt, value)
+		_spec.SetField(subscribe.FieldKind, field.TypeEnum, value)
 	}
 	if value, ok := suo.mutation.Location(); ok {
 		_spec.SetField(subscribe.FieldLocation, field.TypeString, value)
+	}
+	if value, ok := suo.mutation.UpdateTimeoutSeconds(); ok {
+		_spec.SetField(subscribe.FieldUpdateTimeoutSeconds, field.TypeInt, value)
+	}
+	if value, ok := suo.mutation.AddedUpdateTimeoutSeconds(); ok {
+		_spec.AddField(subscribe.FieldUpdateTimeoutSeconds, field.TypeInt, value)
 	}
 	if value, ok := suo.mutation.Latency(); ok {
 		_spec.SetField(subscribe.FieldLatency, field.TypeInt64, value)

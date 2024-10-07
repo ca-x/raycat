@@ -55,14 +55,14 @@ func IDLTE(id uuid.UUID) predicate.Subscribe {
 	return predicate.Subscribe(sql.FieldLTE(FieldID, id))
 }
 
-// Kind applies equality check predicate on the "kind" field. It's identical to KindEQ.
-func Kind(v int) predicate.Subscribe {
-	return predicate.Subscribe(sql.FieldEQ(FieldKind, v))
-}
-
 // Location applies equality check predicate on the "location" field. It's identical to LocationEQ.
 func Location(v string) predicate.Subscribe {
 	return predicate.Subscribe(sql.FieldEQ(FieldLocation, v))
+}
+
+// UpdateTimeoutSeconds applies equality check predicate on the "update_timeout_seconds" field. It's identical to UpdateTimeoutSecondsEQ.
+func UpdateTimeoutSeconds(v int) predicate.Subscribe {
+	return predicate.Subscribe(sql.FieldEQ(FieldUpdateTimeoutSeconds, v))
 }
 
 // Latency applies equality check predicate on the "latency" field. It's identical to LatencyEQ.
@@ -81,43 +81,23 @@ func CreatedAt(v time.Time) predicate.Subscribe {
 }
 
 // KindEQ applies the EQ predicate on the "kind" field.
-func KindEQ(v int) predicate.Subscribe {
+func KindEQ(v Kind) predicate.Subscribe {
 	return predicate.Subscribe(sql.FieldEQ(FieldKind, v))
 }
 
 // KindNEQ applies the NEQ predicate on the "kind" field.
-func KindNEQ(v int) predicate.Subscribe {
+func KindNEQ(v Kind) predicate.Subscribe {
 	return predicate.Subscribe(sql.FieldNEQ(FieldKind, v))
 }
 
 // KindIn applies the In predicate on the "kind" field.
-func KindIn(vs ...int) predicate.Subscribe {
+func KindIn(vs ...Kind) predicate.Subscribe {
 	return predicate.Subscribe(sql.FieldIn(FieldKind, vs...))
 }
 
 // KindNotIn applies the NotIn predicate on the "kind" field.
-func KindNotIn(vs ...int) predicate.Subscribe {
+func KindNotIn(vs ...Kind) predicate.Subscribe {
 	return predicate.Subscribe(sql.FieldNotIn(FieldKind, vs...))
-}
-
-// KindGT applies the GT predicate on the "kind" field.
-func KindGT(v int) predicate.Subscribe {
-	return predicate.Subscribe(sql.FieldGT(FieldKind, v))
-}
-
-// KindGTE applies the GTE predicate on the "kind" field.
-func KindGTE(v int) predicate.Subscribe {
-	return predicate.Subscribe(sql.FieldGTE(FieldKind, v))
-}
-
-// KindLT applies the LT predicate on the "kind" field.
-func KindLT(v int) predicate.Subscribe {
-	return predicate.Subscribe(sql.FieldLT(FieldKind, v))
-}
-
-// KindLTE applies the LTE predicate on the "kind" field.
-func KindLTE(v int) predicate.Subscribe {
-	return predicate.Subscribe(sql.FieldLTE(FieldKind, v))
 }
 
 // LocationEQ applies the EQ predicate on the "location" field.
@@ -183,6 +163,46 @@ func LocationEqualFold(v string) predicate.Subscribe {
 // LocationContainsFold applies the ContainsFold predicate on the "location" field.
 func LocationContainsFold(v string) predicate.Subscribe {
 	return predicate.Subscribe(sql.FieldContainsFold(FieldLocation, v))
+}
+
+// UpdateTimeoutSecondsEQ applies the EQ predicate on the "update_timeout_seconds" field.
+func UpdateTimeoutSecondsEQ(v int) predicate.Subscribe {
+	return predicate.Subscribe(sql.FieldEQ(FieldUpdateTimeoutSeconds, v))
+}
+
+// UpdateTimeoutSecondsNEQ applies the NEQ predicate on the "update_timeout_seconds" field.
+func UpdateTimeoutSecondsNEQ(v int) predicate.Subscribe {
+	return predicate.Subscribe(sql.FieldNEQ(FieldUpdateTimeoutSeconds, v))
+}
+
+// UpdateTimeoutSecondsIn applies the In predicate on the "update_timeout_seconds" field.
+func UpdateTimeoutSecondsIn(vs ...int) predicate.Subscribe {
+	return predicate.Subscribe(sql.FieldIn(FieldUpdateTimeoutSeconds, vs...))
+}
+
+// UpdateTimeoutSecondsNotIn applies the NotIn predicate on the "update_timeout_seconds" field.
+func UpdateTimeoutSecondsNotIn(vs ...int) predicate.Subscribe {
+	return predicate.Subscribe(sql.FieldNotIn(FieldUpdateTimeoutSeconds, vs...))
+}
+
+// UpdateTimeoutSecondsGT applies the GT predicate on the "update_timeout_seconds" field.
+func UpdateTimeoutSecondsGT(v int) predicate.Subscribe {
+	return predicate.Subscribe(sql.FieldGT(FieldUpdateTimeoutSeconds, v))
+}
+
+// UpdateTimeoutSecondsGTE applies the GTE predicate on the "update_timeout_seconds" field.
+func UpdateTimeoutSecondsGTE(v int) predicate.Subscribe {
+	return predicate.Subscribe(sql.FieldGTE(FieldUpdateTimeoutSeconds, v))
+}
+
+// UpdateTimeoutSecondsLT applies the LT predicate on the "update_timeout_seconds" field.
+func UpdateTimeoutSecondsLT(v int) predicate.Subscribe {
+	return predicate.Subscribe(sql.FieldLT(FieldUpdateTimeoutSeconds, v))
+}
+
+// UpdateTimeoutSecondsLTE applies the LTE predicate on the "update_timeout_seconds" field.
+func UpdateTimeoutSecondsLTE(v int) predicate.Subscribe {
+	return predicate.Subscribe(sql.FieldLTE(FieldUpdateTimeoutSeconds, v))
 }
 
 // LatencyEQ applies the EQ predicate on the "latency" field.

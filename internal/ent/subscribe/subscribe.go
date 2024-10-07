@@ -3,6 +3,7 @@
 package subscribe
 
 import (
+	"fmt"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -18,6 +19,8 @@ const (
 	FieldKind = "kind"
 	// FieldLocation holds the string denoting the location field in the database.
 	FieldLocation = "location"
+	// FieldUpdateTimeoutSeconds holds the string denoting the update_timeout_seconds field in the database.
+	FieldUpdateTimeoutSeconds = "update_timeout_seconds"
 	// FieldLatency holds the string denoting the latency field in the database.
 	FieldLatency = "latency"
 	// FieldExpireAt holds the string denoting the expire_at field in the database.
@@ -33,6 +36,7 @@ var Columns = []string{
 	FieldID,
 	FieldKind,
 	FieldLocation,
+	FieldUpdateTimeoutSeconds,
 	FieldLatency,
 	FieldExpireAt,
 	FieldCreatedAt,
@@ -49,11 +53,42 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// DefaultUpdateTimeoutSeconds holds the default value on creation for the "update_timeout_seconds" field.
+	DefaultUpdateTimeoutSeconds int
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )
+
+// Kind defines the type for the "kind" enum field.
+type Kind string
+
+// KindNone is the default value of the Kind enum.
+const DefaultKind = KindNone
+
+// Kind values.
+const (
+	KindURLSub   Kind = "url_sub"
+	KindLocalSub Kind = "local_sub"
+	KindTplSub   Kind = "tpl_sub"
+	KindSubEntry Kind = "sub_entry"
+	KindNone     Kind = "none"
+)
+
+func (k Kind) String() string {
+	return string(k)
+}
+
+// KindValidator is a validator for the "kind" field enum values. It is called by the builders before save.
+func KindValidator(k Kind) error {
+	switch k {
+	case KindURLSub, KindLocalSub, KindTplSub, KindSubEntry, KindNone:
+		return nil
+	default:
+		return fmt.Errorf("subscribe: invalid enum value for kind field: %q", k)
+	}
+}
 
 // OrderOption defines the ordering options for the Subscribe queries.
 type OrderOption func(*sql.Selector)
@@ -71,6 +106,11 @@ func ByKind(opts ...sql.OrderTermOption) OrderOption {
 // ByLocation orders the results by the location field.
 func ByLocation(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLocation, opts...).ToFunc()
+}
+
+// ByUpdateTimeoutSeconds orders the results by the update_timeout_seconds field.
+func ByUpdateTimeoutSeconds(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUpdateTimeoutSeconds, opts...).ToFunc()
 }
 
 // ByLatency orders the results by the latency field.

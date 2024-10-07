@@ -16,8 +16,9 @@ type Subscribe struct {
 func (Subscribe) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}).Default(uuid.New),
-		field.Int("kind"),
+		field.Enum("kind").Values("url_sub", "local_sub", "tpl_sub", "sub_entry", "none").Default("none"),
 		field.String("location").Unique(),
+		field.Int("update_timeout_seconds").Default(2),
 		field.Int64("latency"),
 		field.Time("expire_at"),
 		field.Time("created_at").Default(time.Now),

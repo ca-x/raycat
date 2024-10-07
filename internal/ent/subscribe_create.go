@@ -22,14 +22,36 @@ type SubscribeCreate struct {
 }
 
 // SetKind sets the "kind" field.
-func (sc *SubscribeCreate) SetKind(i int) *SubscribeCreate {
-	sc.mutation.SetKind(i)
+func (sc *SubscribeCreate) SetKind(s subscribe.Kind) *SubscribeCreate {
+	sc.mutation.SetKind(s)
+	return sc
+}
+
+// SetNillableKind sets the "kind" field if the given value is not nil.
+func (sc *SubscribeCreate) SetNillableKind(s *subscribe.Kind) *SubscribeCreate {
+	if s != nil {
+		sc.SetKind(*s)
+	}
 	return sc
 }
 
 // SetLocation sets the "location" field.
 func (sc *SubscribeCreate) SetLocation(s string) *SubscribeCreate {
 	sc.mutation.SetLocation(s)
+	return sc
+}
+
+// SetUpdateTimeoutSeconds sets the "update_timeout_seconds" field.
+func (sc *SubscribeCreate) SetUpdateTimeoutSeconds(i int) *SubscribeCreate {
+	sc.mutation.SetUpdateTimeoutSeconds(i)
+	return sc
+}
+
+// SetNillableUpdateTimeoutSeconds sets the "update_timeout_seconds" field if the given value is not nil.
+func (sc *SubscribeCreate) SetNillableUpdateTimeoutSeconds(i *int) *SubscribeCreate {
+	if i != nil {
+		sc.SetUpdateTimeoutSeconds(*i)
+	}
 	return sc
 }
 
@@ -108,6 +130,14 @@ func (sc *SubscribeCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (sc *SubscribeCreate) defaults() {
+	if _, ok := sc.mutation.Kind(); !ok {
+		v := subscribe.DefaultKind
+		sc.mutation.SetKind(v)
+	}
+	if _, ok := sc.mutation.UpdateTimeoutSeconds(); !ok {
+		v := subscribe.DefaultUpdateTimeoutSeconds
+		sc.mutation.SetUpdateTimeoutSeconds(v)
+	}
 	if _, ok := sc.mutation.CreatedAt(); !ok {
 		v := subscribe.DefaultCreatedAt()
 		sc.mutation.SetCreatedAt(v)
@@ -123,8 +153,16 @@ func (sc *SubscribeCreate) check() error {
 	if _, ok := sc.mutation.Kind(); !ok {
 		return &ValidationError{Name: "kind", err: errors.New(`ent: missing required field "Subscribe.kind"`)}
 	}
+	if v, ok := sc.mutation.Kind(); ok {
+		if err := subscribe.KindValidator(v); err != nil {
+			return &ValidationError{Name: "kind", err: fmt.Errorf(`ent: validator failed for field "Subscribe.kind": %w`, err)}
+		}
+	}
 	if _, ok := sc.mutation.Location(); !ok {
 		return &ValidationError{Name: "location", err: errors.New(`ent: missing required field "Subscribe.location"`)}
+	}
+	if _, ok := sc.mutation.UpdateTimeoutSeconds(); !ok {
+		return &ValidationError{Name: "update_timeout_seconds", err: errors.New(`ent: missing required field "Subscribe.update_timeout_seconds"`)}
 	}
 	if _, ok := sc.mutation.Latency(); !ok {
 		return &ValidationError{Name: "latency", err: errors.New(`ent: missing required field "Subscribe.latency"`)}
@@ -171,12 +209,16 @@ func (sc *SubscribeCreate) createSpec() (*Subscribe, *sqlgraph.CreateSpec) {
 		_spec.ID.Value = &id
 	}
 	if value, ok := sc.mutation.Kind(); ok {
-		_spec.SetField(subscribe.FieldKind, field.TypeInt, value)
+		_spec.SetField(subscribe.FieldKind, field.TypeEnum, value)
 		_node.Kind = value
 	}
 	if value, ok := sc.mutation.Location(); ok {
 		_spec.SetField(subscribe.FieldLocation, field.TypeString, value)
 		_node.Location = value
+	}
+	if value, ok := sc.mutation.UpdateTimeoutSeconds(); ok {
+		_spec.SetField(subscribe.FieldUpdateTimeoutSeconds, field.TypeInt, value)
+		_node.UpdateTimeoutSeconds = value
 	}
 	if value, ok := sc.mutation.Latency(); ok {
 		_spec.SetField(subscribe.FieldLatency, field.TypeInt64, value)
