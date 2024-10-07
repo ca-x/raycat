@@ -38,7 +38,7 @@ archives:
 - format: binary
 
 snapshot:
-  name_template: "{{ .Tag }}"
+  version_template: "{{ .Tag }}"
 
 changelog:
   sort: asc
