@@ -14,18 +14,27 @@ binary = "raycat"
 # `weaver single deploy`. See serviceweaver.dev/docs.html#single-process for
 # more information about the single process deployer.
 
-["raycat/subFileSourceProvider"]
-file_paths = [
+["raycat/subConfigureProvider"]
+public_sub_file_paths = [
     "sss",
-    "yyyy",
+    "ddd"
 ]
+private_sub_file_paths = [
+    "sss1",
+    "ddd1"
+]
+url_sub_fetch_timeout_seconds = 2
+public_url_subs = [
+    "url1",
+    "url2"
+]
+private_url_subs = [
+    "url3",
+    "url4"
+]
+private_sub_token = "gopher"
 
-["raycat/subURLSourceProvider"]
-timeout_seconds = 2
-url_subs = [
-    "ssss",
-    "zzzz"
-]
+
 
 
 [single]

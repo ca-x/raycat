@@ -17,36 +17,28 @@ var (
 	urlBuf    = tinypool.New(tinypool.BufReset)
 )
 
-type subUrlSourceConfig struct {
-	weaver.AutoMarshal
-	TimeoutSeconds int      `toml:"timeout_seconds"`
-	UrlSubs        []string `toml:"url_subs"`
-}
-
 type subURLSourceProvider interface {
-	UpdateUrlSub(ctx context.Context) ([]byte, error)
+	UpdateUrlSub(ctx context.Context, urlSubs []string, fetchTimeoutSeconds int) ([]byte, error)
 }
 
 type subURLSource struct {
 	weaver.Implements[subURLSourceProvider]
-	weaver.WithConfig[subUrlSourceConfig]
 }
 
-func (s *subURLSource) UpdateUrlSub(ctx context.Context) ([]byte, error) {
-	config := s.Config()
+func (s *subURLSource) UpdateUrlSub(ctx context.Context, urlSubs []string, fetchTimeoutSeconds int) ([]byte, error) {
 
 	buf := urlBuf.Get()
 	defer urlBuf.Free(buf)
 
-	st := stream.New().WithMaxGoroutines(len(config.UrlSubs))
-	for _, sub := range config.UrlSubs {
+	st := stream.New().WithMaxGoroutines(len(urlSubs))
+	for _, sub := range urlSubs {
 		sub := sub
 		if subContent, found := urlSubLru.Get(sub); found {
 			buf.Write(subContent)
 			continue
 		}
 		st.Go(func() stream.Callback {
-			client := fetcher.NewClient(config.TimeoutSeconds)
+			client := fetcher.NewClient(fetchTimeoutSeconds)
 			content, err := client.Fetch(sub)
 			if err != nil {
 				s.Logger(ctx).Error("failed to fetch url sub from source", "url", sub, "error", err)

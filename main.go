@@ -27,9 +27,10 @@ func main() {
 // app implements the main component, the entry point to a Service Weaver app.
 type app struct {
 	weaver.Implements[weaver.Main]
-	fileSub weaver.Ref[subFileSourceProvider]
-	urlSub  weaver.Ref[subURLSourceProvider]
-	lis     weaver.Listener `weaver:"lis"`
+	configure weaver.Ref[subConfigureProvider]
+	fileSub   weaver.Ref[subFileSourceProvider]
+	urlSub    weaver.Ref[subURLSourceProvider]
+	lis       weaver.Listener `weaver:"lis"`
 }
 
 // serve serves HTTP traffic.
@@ -40,20 +41,27 @@ func serve(ctx context.Context, app *app) error {
 }
 
 func subShareHandlerApp(app *app) func(w http.ResponseWriter, _ *http.Request) {
-	fileSub, err := app.fileSub.Get().UpdateFileSub(context.Background())
-	if err != nil {
-		app.Logger(context.Background()).Error("failed to get file sub update", "error", err)
-	}
-	urlSub, err := app.urlSub.Get().UpdateUrlSub(context.Background())
-	if err != nil {
-		app.Logger(context.Background()).Error("failed to get url sub update", "error", err)
-	}
-	return func(w http.ResponseWriter, _ *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		encoder := base64.NewEncoder(base64.StdEncoding, w)
 		defer encoder.Close()
 
 		buf := bufPool.Get()
 		defer bufPool.Free(buf)
+
+		privateToken := r.URL.Query().Get("token")
+
+		subFilePaths, _ := app.configure.Get().GetSubFilePaths(context.Background(), privateToken)
+		urlSubPaths, timeout, _ := app.configure.Get().GetUrlSubs(context.Background(), privateToken)
+
+		fileSub, err := app.fileSub.Get().UpdateFileSub(context.Background(), subFilePaths)
+		if err != nil {
+			app.Logger(context.Background()).Error("failed to get file sub update", "error", err)
+		}
+
+		urlSub, err := app.urlSub.Get().UpdateUrlSub(context.Background(), urlSubPaths, timeout)
+		if err != nil {
+			app.Logger(context.Background()).Error("failed to get url sub update", "error", err)
+		}
 
 		if len(fileSub) > 0 {
 			if _, err = buf.Write(fileSub); err != nil {
