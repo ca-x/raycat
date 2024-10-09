@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -42,6 +43,16 @@ func serve(ctx context.Context, app *app) error {
 
 func subShareHandlerApp(app *app) func(w http.ResponseWriter, _ *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
+
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization,profile-web-page-url,profile-update-interval")
+
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
 		encoder := base64.NewEncoder(base64.StdEncoding, w)
 		defer encoder.Close()
 
@@ -72,6 +83,20 @@ func subShareHandlerApp(app *app) func(w http.ResponseWriter, _ *http.Request) {
 		if len(urlSub) > 0 {
 			if _, err = buf.Write(urlSub); err != nil {
 				app.Logger(context.Background()).Error("failed to write url sub to buffer", "error", err)
+			}
+		}
+
+		// handle for client experience
+		responseOpt, err := app.configure.Get().GetResponseOption(context.Background())
+		if err != nil {
+			app.Logger(context.Background()).Warn("failed to get response option", "error", err)
+		}
+		if responseOpt != nil {
+			if responseOpt.ProfileWebPage != "" {
+				w.Header().Set("profile-web-page-url", responseOpt.ProfileWebPage)
+			}
+			if responseOpt.UpdateIntervalHours > 0 {
+				w.Header().Set("profile-update-interval", fmt.Sprintf("%d", responseOpt.UpdateIntervalHours))
 			}
 		}
 
