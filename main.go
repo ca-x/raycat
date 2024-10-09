@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"raycat/internal/pkg/tinypool"
+	"strconv"
 
 	"github.com/ServiceWeaver/weaver"
 )
@@ -96,7 +96,7 @@ func subShareHandlerApp(app *app) func(w http.ResponseWriter, _ *http.Request) {
 				w.Header().Set("profile-web-page-url", responseOpt.ProfileWebPage)
 			}
 			if responseOpt.UpdateIntervalHours > 0 {
-				w.Header().Set("profile-update-interval", fmt.Sprintf("%d", responseOpt.UpdateIntervalHours))
+				w.Header().Set("profile-update-interval", strconv.Itoa(responseOpt.UpdateIntervalHours))
 			}
 		}
 
