@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"raycat/internal/pkg/tinypool"
 	"strconv"
+	"strings"
 
 	"github.com/ServiceWeaver/weaver"
 )
@@ -36,14 +37,22 @@ type app struct {
 
 // serve serves HTTP traffic.
 func serve(ctx context.Context, app *app) error {
-	http.HandleFunc("/x", subShareHandlerApp(app))
+	config := app.configure.Get()
+	subPublishPath, err := config.GetSubPublishPath(ctx)
+	if err != nil {
+		app.Logger(ctx).Warn("failed to get sub publish path,will use /subscribe as default", "err", err)
+		subPublishPath = "/subscribe"
+	}
+	if !strings.HasPrefix(subPublishPath, "/") {
+		subPublishPath = "/" + subPublishPath
+	}
+	http.HandleFunc(subPublishPath, subShareHandlerApp(app))
 	app.Logger(ctx).Info("Listening on...", "address", app.lis)
 	return http.Serve(app.lis, nil)
 }
 
 func subShareHandlerApp(app *app) func(w http.ResponseWriter, _ *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization,profile-web-page-url,profile-update-interval")

@@ -33,6 +33,7 @@ private_url_subs = [
     "url4"
 ]
 private_sub_token = "gopher"
+sub_publish_path = "/subscibe"
 ["raycat/subConfigureProvider".response_option]
 update_interval_hours = 8
 profile_web_page = "https://x.com"

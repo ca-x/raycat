@@ -7,7 +7,8 @@ import (
 )
 
 var (
-	noResponseOptionConfiguredError = errors.New("no response option configured")
+	responseOptionNotConfiguredError = errors.New("no response option configured")
+	subPublishPathNotConfiguredError = errors.New("sub publish path not configured")
 )
 
 var _ subConfigureProvider = (*subConfigure)(nil)
@@ -15,6 +16,7 @@ var _ subConfigureProvider = (*subConfigure)(nil)
 type subConfigureProvider interface {
 	GetSubFilePaths(ctx context.Context, privateSubToken string) ([]string, error)
 	GetUrlSubs(ctx context.Context, privateSubToken string) ([]string, int, error)
+	GetSubPublishPath(ctx context.Context) (string, error)
 	GetResponseOption(ctx context.Context) (*responseOption, error)
 }
 
@@ -27,6 +29,7 @@ type subConfig struct {
 	PrivateUrlSubs            []string `toml:"private_url_subs"`
 
 	PrivateSubToken string          `toml:"private_sub_token"`
+	SubPublishPath  string          `toml:"sub_publish_path,omitempty"`
 	ResponseOption  *responseOption `toml:"response_option,omitempty"`
 }
 
@@ -60,10 +63,17 @@ func (s *subConfigure) GetUrlSubs(ctx context.Context, privateSubToken string) (
 	return append(config.PrivateUrlSubs, config.PublicUrlSubs...), config.UrlSubFetchTimeoutSeconds, nil
 }
 
+func (s *subConfigure) GetSubPublishPath(ctx context.Context) (string, error) {
+	if s.Config().SubPublishPath == "" {
+		return "", subPublishPathNotConfiguredError
+	}
+	return s.Config().SubPublishPath, nil
+}
+
 func (s *subConfigure) GetResponseOption(ctx context.Context) (*responseOption, error) {
 	config := s.Config()
 	if config.ResponseOption == nil {
-		return nil, noResponseOptionConfiguredError
+		return nil, responseOptionNotConfiguredError
 	}
 	return config.ResponseOption, nil
 }
