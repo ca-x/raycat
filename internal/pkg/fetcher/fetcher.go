@@ -6,6 +6,7 @@ import (
 	"github.com/go-resty/resty/v2"
 	"net/http"
 	"raycat/internal/pkg/bytesEx"
+	"raycat/internal/pkg/subinfo"
 	"time"
 )
 
@@ -30,16 +31,27 @@ func (c *Client) Fetch(baseUrl string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	var result []byte
 	if !bytesEx.IsBase64(resp.Body()) {
-		return resp.Body(), nil
+		result = resp.Body()
+	} else {
+		decodeLen := base64.StdEncoding.EncodedLen(len(resp.Body()))
+		decoded := make([]byte, decodeLen)
+		n, err := base64.StdEncoding.Decode(decoded, resp.Body())
+		if err != nil {
+			return nil, err
+		}
+		result = decoded[:n]
 	}
-	decodeLen := base64.StdEncoding.EncodedLen(len(resp.Body()))
-	decoded := make([]byte, decodeLen)
-	n, err := base64.StdEncoding.Decode(decoded, resp.Body())
-	if err != nil {
-		return nil, err
+	// check the sub has Subscription-Userinfo
+	subscribeInfo := resp.Header().Get("Subscription-Userinfo")
+	if subscribeInfo != "" {
+		info, err := subinfo.ParseSubscriptionInfo(subscribeInfo)
+		if err == nil && info != nil {
+			result = bytesEx.AppendPerLine(result, info.String())
+		}
 	}
-	return decoded[:n], nil
+	return result, nil
 }
 
 func checkResourceAvailable(url string) bool {
