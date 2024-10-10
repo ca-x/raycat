@@ -37,10 +37,10 @@ func init() {
 		Iface: reflect.TypeOf((*subConfigureProvider)(nil)).Elem(),
 		Impl:  reflect.TypeOf(subConfigure{}),
 		LocalStubFn: func(impl any, caller string, tracer trace.Tracer) any {
-			return subConfigureProvider_local_stub{impl: impl.(subConfigureProvider), tracer: tracer, getResponseOptionMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "raycat/subConfigureProvider", Method: "GetResponseOption", Remote: false, Generated: true}), getSubFilePathsMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "raycat/subConfigureProvider", Method: "GetSubFilePaths", Remote: false, Generated: true}), getSubPublishPathMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "raycat/subConfigureProvider", Method: "GetSubPublishPath", Remote: false, Generated: true}), getUrlSubsMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "raycat/subConfigureProvider", Method: "GetUrlSubs", Remote: false, Generated: true})}
+			return subConfigureProvider_local_stub{impl: impl.(subConfigureProvider), tracer: tracer, getResponseOptionMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "raycat/subConfigureProvider", Method: "GetResponseOption", Remote: false, Generated: true}), getSubAuthParamNameMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "raycat/subConfigureProvider", Method: "GetSubAuthParamName", Remote: false, Generated: true}), getSubFilePathsMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "raycat/subConfigureProvider", Method: "GetSubFilePaths", Remote: false, Generated: true}), getSubPublishPathMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "raycat/subConfigureProvider", Method: "GetSubPublishPath", Remote: false, Generated: true}), getUrlSubsMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "raycat/subConfigureProvider", Method: "GetUrlSubs", Remote: false, Generated: true})}
 		},
 		ClientStubFn: func(stub codegen.Stub, caller string) any {
-			return subConfigureProvider_client_stub{stub: stub, getResponseOptionMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "raycat/subConfigureProvider", Method: "GetResponseOption", Remote: true, Generated: true}), getSubFilePathsMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "raycat/subConfigureProvider", Method: "GetSubFilePaths", Remote: true, Generated: true}), getSubPublishPathMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "raycat/subConfigureProvider", Method: "GetSubPublishPath", Remote: true, Generated: true}), getUrlSubsMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "raycat/subConfigureProvider", Method: "GetUrlSubs", Remote: true, Generated: true})}
+			return subConfigureProvider_client_stub{stub: stub, getResponseOptionMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "raycat/subConfigureProvider", Method: "GetResponseOption", Remote: true, Generated: true}), getSubAuthParamNameMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "raycat/subConfigureProvider", Method: "GetSubAuthParamName", Remote: true, Generated: true}), getSubFilePathsMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "raycat/subConfigureProvider", Method: "GetSubFilePaths", Remote: true, Generated: true}), getSubPublishPathMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "raycat/subConfigureProvider", Method: "GetSubPublishPath", Remote: true, Generated: true}), getUrlSubsMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "raycat/subConfigureProvider", Method: "GetUrlSubs", Remote: true, Generated: true})}
 		},
 		ServerStubFn: func(impl any, addLoad func(uint64, float64)) codegen.Server {
 			return subConfigureProvider_server_stub{impl: impl.(subConfigureProvider), addLoad: addLoad}
@@ -111,12 +111,13 @@ type main_local_stub struct {
 var _ weaver.Main = (*main_local_stub)(nil)
 
 type subConfigureProvider_local_stub struct {
-	impl                     subConfigureProvider
-	tracer                   trace.Tracer
-	getResponseOptionMetrics *codegen.MethodMetrics
-	getSubFilePathsMetrics   *codegen.MethodMetrics
-	getSubPublishPathMetrics *codegen.MethodMetrics
-	getUrlSubsMetrics        *codegen.MethodMetrics
+	impl                       subConfigureProvider
+	tracer                     trace.Tracer
+	getResponseOptionMetrics   *codegen.MethodMetrics
+	getSubAuthParamNameMetrics *codegen.MethodMetrics
+	getSubFilePathsMetrics     *codegen.MethodMetrics
+	getSubPublishPathMetrics   *codegen.MethodMetrics
+	getUrlSubsMetrics          *codegen.MethodMetrics
 }
 
 // Check that subConfigureProvider_local_stub implements the subConfigureProvider interface.
@@ -140,6 +141,26 @@ func (s subConfigureProvider_local_stub) GetResponseOption(ctx context.Context) 
 	}
 
 	return s.impl.GetResponseOption(ctx)
+}
+
+func (s subConfigureProvider_local_stub) GetSubAuthParamName(ctx context.Context) (r0 string, err error) {
+	// Update metrics.
+	begin := s.getSubAuthParamNameMetrics.Begin()
+	defer func() { s.getSubAuthParamNameMetrics.End(begin, err != nil, 0, 0) }()
+	span := trace.SpanFromContext(ctx)
+	if span.SpanContext().IsValid() {
+		// Create a child span for this method.
+		ctx, span = s.tracer.Start(ctx, "main.subConfigureProvider.GetSubAuthParamName", trace.WithSpanKind(trace.SpanKindInternal))
+		defer func() {
+			if err != nil {
+				span.RecordError(err)
+				span.SetStatus(codes.Error, err.Error())
+			}
+			span.End()
+		}()
+	}
+
+	return s.impl.GetSubAuthParamName(ctx)
 }
 
 func (s subConfigureProvider_local_stub) GetSubFilePaths(ctx context.Context, a0 string) (r0 []string, err error) {
@@ -270,11 +291,12 @@ type main_client_stub struct {
 var _ weaver.Main = (*main_client_stub)(nil)
 
 type subConfigureProvider_client_stub struct {
-	stub                     codegen.Stub
-	getResponseOptionMetrics *codegen.MethodMetrics
-	getSubFilePathsMetrics   *codegen.MethodMetrics
-	getSubPublishPathMetrics *codegen.MethodMetrics
-	getUrlSubsMetrics        *codegen.MethodMetrics
+	stub                       codegen.Stub
+	getResponseOptionMetrics   *codegen.MethodMetrics
+	getSubAuthParamNameMetrics *codegen.MethodMetrics
+	getSubFilePathsMetrics     *codegen.MethodMetrics
+	getSubPublishPathMetrics   *codegen.MethodMetrics
+	getUrlSubsMetrics          *codegen.MethodMetrics
 }
 
 // Check that subConfigureProvider_client_stub implements the subConfigureProvider interface.
@@ -327,6 +349,53 @@ func (s subConfigureProvider_client_stub) GetResponseOption(ctx context.Context)
 	return
 }
 
+func (s subConfigureProvider_client_stub) GetSubAuthParamName(ctx context.Context) (r0 string, err error) {
+	// Update metrics.
+	var requestBytes, replyBytes int
+	begin := s.getSubAuthParamNameMetrics.Begin()
+	defer func() { s.getSubAuthParamNameMetrics.End(begin, err != nil, requestBytes, replyBytes) }()
+
+	span := trace.SpanFromContext(ctx)
+	if span.SpanContext().IsValid() {
+		// Create a child span for this method.
+		ctx, span = s.stub.Tracer().Start(ctx, "main.subConfigureProvider.GetSubAuthParamName", trace.WithSpanKind(trace.SpanKindClient))
+	}
+
+	defer func() {
+		// Catch and return any panics detected during encoding/decoding/rpc.
+		if err == nil {
+			err = codegen.CatchPanics(recover())
+			if err != nil {
+				err = errors.Join(weaver.RemoteCallError, err)
+			}
+		}
+
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
+		}
+		span.End()
+
+	}()
+
+	var shardKey uint64
+
+	// Call the remote method.
+	var results []byte
+	results, err = s.stub.Run(ctx, 1, nil, shardKey)
+	replyBytes = len(results)
+	if err != nil {
+		err = errors.Join(weaver.RemoteCallError, err)
+		return
+	}
+
+	// Decode the results.
+	dec := codegen.NewDecoder(results)
+	r0 = dec.String()
+	err = dec.Error()
+	return
+}
+
 func (s subConfigureProvider_client_stub) GetSubFilePaths(ctx context.Context, a0 string) (r0 []string, err error) {
 	// Update metrics.
 	var requestBytes, replyBytes int
@@ -369,7 +438,7 @@ func (s subConfigureProvider_client_stub) GetSubFilePaths(ctx context.Context, a
 	// Call the remote method.
 	requestBytes = len(enc.Data())
 	var results []byte
-	results, err = s.stub.Run(ctx, 1, enc.Data(), shardKey)
+	results, err = s.stub.Run(ctx, 2, enc.Data(), shardKey)
 	replyBytes = len(results)
 	if err != nil {
 		err = errors.Join(weaver.RemoteCallError, err)
@@ -416,7 +485,7 @@ func (s subConfigureProvider_client_stub) GetSubPublishPath(ctx context.Context)
 
 	// Call the remote method.
 	var results []byte
-	results, err = s.stub.Run(ctx, 2, nil, shardKey)
+	results, err = s.stub.Run(ctx, 3, nil, shardKey)
 	replyBytes = len(results)
 	if err != nil {
 		err = errors.Join(weaver.RemoteCallError, err)
@@ -472,7 +541,7 @@ func (s subConfigureProvider_client_stub) GetUrlSubs(ctx context.Context, a0 str
 	// Call the remote method.
 	requestBytes = len(enc.Data())
 	var results []byte
-	results, err = s.stub.Run(ctx, 3, enc.Data(), shardKey)
+	results, err = s.stub.Run(ctx, 4, enc.Data(), shardKey)
 	replyBytes = len(results)
 	if err != nil {
 		err = errors.Join(weaver.RemoteCallError, err)
@@ -660,6 +729,8 @@ func (s subConfigureProvider_server_stub) GetStubFn(method string) func(ctx cont
 	switch method {
 	case "GetResponseOption":
 		return s.getResponseOption
+	case "GetSubAuthParamName":
+		return s.getSubAuthParamName
 	case "GetSubFilePaths":
 		return s.getSubFilePaths
 	case "GetSubPublishPath":
@@ -687,6 +758,26 @@ func (s subConfigureProvider_server_stub) getResponseOption(ctx context.Context,
 	// Encode the results.
 	enc := codegen.NewEncoder()
 	serviceweaver_enc_ptr_responseOption_4a459b91(enc, r0)
+	enc.Error(appErr)
+	return enc.Data(), nil
+}
+
+func (s subConfigureProvider_server_stub) getSubAuthParamName(ctx context.Context, args []byte) (res []byte, err error) {
+	// Catch and return any panics detected during encoding/decoding/rpc.
+	defer func() {
+		if err == nil {
+			err = codegen.CatchPanics(recover())
+		}
+	}()
+
+	// TODO(rgrandl): The deferred function above will recover from panics in the
+	// user code: fix this.
+	// Call the local method.
+	r0, appErr := s.impl.GetSubAuthParamName(ctx)
+
+	// Encode the results.
+	enc := codegen.NewEncoder()
+	enc.String(r0)
 	enc.Error(appErr)
 	return enc.Data(), nil
 }
@@ -871,6 +962,11 @@ func (s subConfigureProvider_reflect_stub) GetResponseOption(ctx context.Context
 	return
 }
 
+func (s subConfigureProvider_reflect_stub) GetSubAuthParamName(ctx context.Context) (r0 string, err error) {
+	err = s.caller("GetSubAuthParamName", ctx, []any{}, []any{&r0})
+	return
+}
+
 func (s subConfigureProvider_reflect_stub) GetSubFilePaths(ctx context.Context, a0 string) (r0 []string, err error) {
 	err = s.caller("GetSubFilePaths", ctx, []any{a0}, []any{&r0})
 	return
@@ -949,6 +1045,7 @@ type __is_subConfig[T ~struct {
 	PrivateUrlSubs            []string        "toml:\"private_url_subs\""
 	PrivateSubToken           string          "toml:\"private_sub_token\""
 	SubPublishPath            string          "toml:\"sub_publish_path,omitempty\""
+	SubAuthParamName          string          "toml:\"sub_auth_param_name\""
 	ResponseOption            *responseOption "toml:\"response_option,omitempty\""
 }] struct{}
 
@@ -965,6 +1062,7 @@ func (x *subConfig) WeaverMarshal(enc *codegen.Encoder) {
 	serviceweaver_enc_slice_string_4af10117(enc, x.PrivateUrlSubs)
 	enc.String(x.PrivateSubToken)
 	enc.String(x.SubPublishPath)
+	enc.String(x.SubAuthParamName)
 	serviceweaver_enc_ptr_responseOption_4a459b91(enc, x.ResponseOption)
 }
 
@@ -979,6 +1077,7 @@ func (x *subConfig) WeaverUnmarshal(dec *codegen.Decoder) {
 	x.PrivateUrlSubs = serviceweaver_dec_slice_string_4af10117(dec)
 	x.PrivateSubToken = dec.String()
 	x.SubPublishPath = dec.String()
+	x.SubAuthParamName = dec.String()
 	x.ResponseOption = serviceweaver_dec_ptr_responseOption_4a459b91(dec)
 }
 

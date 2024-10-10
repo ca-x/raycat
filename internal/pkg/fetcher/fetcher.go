@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/go-resty/resty/v2"
 	"net/http"
+	"raycat/internal/pkg/bytesEx"
 	"time"
 )
 
@@ -29,7 +30,7 @@ func (c *Client) Fetch(baseUrl string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	if !isBase64(resp.Body()) {
+	if !bytesEx.IsBase64(resp.Body()) {
 		return resp.Body(), nil
 	}
 	decodeLen := base64.StdEncoding.EncodedLen(len(resp.Body()))
@@ -39,18 +40,6 @@ func (c *Client) Fetch(baseUrl string) ([]byte, error) {
 		return nil, err
 	}
 	return decoded[:n], nil
-}
-
-func isBase64(data []byte) bool {
-	if len(data)%4 != 0 {
-		return false
-	}
-	for _, b := range data {
-		if !((b >= 'A' && b <= 'Z') || (b >= 'a' && b <= 'z') || (b >= '0' && b <= '9') || b == '+' || b == '/' || b == '=') {
-			return false
-		}
-	}
-	return true
 }
 
 func checkResourceAvailable(url string) bool {

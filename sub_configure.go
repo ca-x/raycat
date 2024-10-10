@@ -7,8 +7,9 @@ import (
 )
 
 var (
-	responseOptionNotConfiguredError = errors.New("no response option configured")
-	subPublishPathNotConfiguredError = errors.New("sub publish path not configured")
+	responseOptionNotConfiguredError   = errors.New("no response option configured")
+	subPublishPathNotConfiguredError   = errors.New("sub publish path not configured")
+	subAuthParamNameNotConfiguredError = errors.New("sub auth param name not configured")
 )
 
 var _ subConfigureProvider = (*subConfigure)(nil)
@@ -17,6 +18,7 @@ type subConfigureProvider interface {
 	GetSubFilePaths(ctx context.Context, privateSubToken string) ([]string, error)
 	GetUrlSubs(ctx context.Context, privateSubToken string) ([]string, int, error)
 	GetSubPublishPath(ctx context.Context) (string, error)
+	GetSubAuthParamName(ctx context.Context) (string, error)
 	GetResponseOption(ctx context.Context) (*responseOption, error)
 }
 
@@ -28,9 +30,10 @@ type subConfig struct {
 	PublicUrlSubs             []string `toml:"public_url_subs"`
 	PrivateUrlSubs            []string `toml:"private_url_subs"`
 
-	PrivateSubToken string          `toml:"private_sub_token"`
-	SubPublishPath  string          `toml:"sub_publish_path,omitempty"`
-	ResponseOption  *responseOption `toml:"response_option,omitempty"`
+	PrivateSubToken  string          `toml:"private_sub_token"`
+	SubPublishPath   string          `toml:"sub_publish_path,omitempty"`
+	SubAuthParamName string          `toml:"sub_auth_param_name"`
+	ResponseOption   *responseOption `toml:"response_option,omitempty"`
 }
 
 type responseOption struct {
@@ -70,6 +73,12 @@ func (s *subConfigure) GetSubPublishPath(ctx context.Context) (string, error) {
 	return s.Config().SubPublishPath, nil
 }
 
+func (s *subConfigure) GetSubAuthParamName(ctx context.Context) (string, error) {
+	if s.Config().SubAuthParamName == "" {
+		return "", subAuthParamNameNotConfiguredError
+	}
+	return s.Config().SubAuthParamName, nil
+}
 func (s *subConfigure) GetResponseOption(ctx context.Context) (*responseOption, error) {
 	config := s.Config()
 	if config.ResponseOption == nil {

@@ -5,6 +5,7 @@ import (
 	"github.com/ServiceWeaver/weaver"
 	"github.com/hashicorp/golang-lru/v2/expirable"
 	"github.com/sourcegraph/conc/stream"
+	"raycat/internal/pkg/bytesEx"
 	"raycat/internal/pkg/fetcher"
 	"raycat/internal/pkg/tinypool"
 	"time"
@@ -45,6 +46,9 @@ func (s *subURLSource) UpdateUrlSub(ctx context.Context, urlSubs []string, fetch
 				return func() {
 					urlSubLru.Remove(sub)
 				}
+			}
+			if !bytesEx.IsLastByteNewline(content) {
+				content = append(content, byte('\n'))
 			}
 			return func() {
 				urlSubLru.Add(sub, content)

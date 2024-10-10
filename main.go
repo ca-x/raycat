@@ -68,7 +68,13 @@ func subShareHandlerApp(app *app) func(w http.ResponseWriter, _ *http.Request) {
 		buf := bufPool.Get()
 		defer bufPool.Free(buf)
 
-		privateToken := r.URL.Query().Get("token")
+		authParamName, err := app.configure.Get().GetSubAuthParamName(context.Background())
+		if err != nil {
+			app.Logger(context.Background()).Warn("failed to get sub auth param name,use default name token", "err", err)
+			authParamName = "token"
+		}
+
+		privateToken := r.URL.Query().Get(authParamName)
 
 		subFilePaths, _ := app.configure.Get().GetSubFilePaths(context.Background(), privateToken)
 		urlSubPaths, timeout, _ := app.configure.Get().GetUrlSubs(context.Background(), privateToken)
