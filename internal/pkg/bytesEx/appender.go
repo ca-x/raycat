@@ -4,6 +4,9 @@ import "bytes"
 
 func AppendPerLine(bytesToAppend []byte, appendContent string) []byte {
 	parts := bytes.Split(bytesToAppend, []byte{'\n'})
+	if len(parts) == 1 {
+		return bytesToAppend
+	}
 	var buffer bytes.Buffer
 	for i, part := range parts {
 		buffer.Write(part)
