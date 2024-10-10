@@ -7,7 +7,10 @@ func AppendPerLine(bytesToAppend []byte, appendContent string) []byte {
 	var buffer bytes.Buffer
 	for i, part := range parts {
 		buffer.Write(part)
-		buffer.WriteString(appendContent)
+		// only handle contains # ones for this moment
+		if bytes.Contains(part, []byte("#")) {
+			buffer.WriteString(appendContent)
+		}
 		if i < len(parts)-1 {
 			buffer.WriteByte('\n')
 		}
