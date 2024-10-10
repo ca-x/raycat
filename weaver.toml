@@ -34,7 +34,8 @@ private_url_subs = [
 ]
 private_sub_token = "gopher"
 sub_publish_path = "/subscibe"
-authParamName = "ak"
+sub_auth_param_name = "x-id"
+
 ["raycat/subConfigureProvider".response_option]
 update_interval_hours = 8
 profile_web_page = "https://x.com"

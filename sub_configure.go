@@ -32,7 +32,7 @@ type subConfig struct {
 
 	PrivateSubToken  string          `toml:"private_sub_token"`
 	SubPublishPath   string          `toml:"sub_publish_path,omitempty"`
-	SubAuthParamName string          `toml:"sub_auth_param_name"`
+	SubAuthParamName string          `toml:"sub_auth_param_name,omitempty"`
 	ResponseOption   *responseOption `toml:"response_option,omitempty"`
 }
 
