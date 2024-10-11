@@ -4,14 +4,14 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
+	"github.com/ServiceWeaver/weaver"
 	"io"
 	"log"
 	"net/http"
+	"raycat/internal/pkg/stats"
 	"raycat/internal/pkg/tinypool"
 	"strconv"
 	"strings"
-
-	"github.com/ServiceWeaver/weaver"
 )
 
 //go:generate weaver generate ./...
@@ -47,6 +47,7 @@ func serve(ctx context.Context, app *app) error {
 		subPublishPath = "/" + subPublishPath
 	}
 	http.HandleFunc(subPublishPath, subShareHandlerApp(app))
+	http.HandleFunc("/stats", stats.Handler)
 	app.Logger(ctx).Info("Listening on...", "address", app.lis)
 	return http.Serve(app.lis, nil)
 }
