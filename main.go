@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"raycat/internal/pkg/stats"
 	"raycat/internal/pkg/tinypool"
 	"strconv"
 	"strings"
@@ -47,6 +48,7 @@ func serve(ctx context.Context, app *app) error {
 	if !strings.HasPrefix(subPublishPath, "/") {
 		subPublishPath = "/" + subPublishPath
 	}
+	http.HandleFunc("/stats", stats.Handler)
 	http.Handle(subPublishPath, weaver.InstrumentHandlerFunc("subscribeCallCount", subShareHandlerApp(app)))
 	app.Logger(ctx).Info("Listening on...", "address", app.lis)
 	return http.Serve(app.lis, nil)
