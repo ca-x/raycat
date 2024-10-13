@@ -46,7 +46,7 @@ func serve(ctx context.Context, app *app) error {
 	if !strings.HasPrefix(subPublishPath, "/") {
 		subPublishPath = "/" + subPublishPath
 	}
-	http.HandleFunc(subPublishPath, subShareHandlerApp(app))
+	http.Handle(subPublishPath, weaver.InstrumentHandler("subscribeProbe", http.HandlerFunc(subShareHandlerApp(app))))
 	app.Logger(ctx).Info("Listening on...", "address", app.lis)
 	return http.Serve(app.lis, nil)
 }
