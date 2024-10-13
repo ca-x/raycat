@@ -3,7 +3,7 @@ module raycat
 go 1.23
 
 require (
-	github.com/ServiceWeaver/weaver v0.23.2
+	github.com/ServiceWeaver/weaver v0.24.6
 	github.com/fukata/golang-stats-api-handler v1.0.0
 	github.com/go-resty/resty/v2 v2.15.3
 	github.com/hashicorp/golang-lru/v2 v2.0.7
@@ -25,7 +25,7 @@ require (
 	github.com/google/pprof v0.0.0-20230705174524-200ffdc848b8 // indirect
 	github.com/google/uuid v1.3.1 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
-	github.com/lightstep/varopt v1.3.0 // indirect
+	github.com/lightstep/varopt v1.4.0 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect

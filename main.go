@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/ServiceWeaver/weaver"
+	"github.com/ServiceWeaver/weaver/metadata"
 )
 
 //go:generate weaver generate ./...
@@ -76,8 +77,10 @@ func subShareHandlerApp(app *app) func(w http.ResponseWriter, _ *http.Request) {
 
 		privateToken := r.URL.Query().Get(authParamName)
 
-		subFilePaths, _ := app.configure.Get().GetSubFilePaths(context.Background(), privateToken)
-		urlSubPaths, timeout, _ := app.configure.Get().GetUrlSubs(context.Background(), privateToken)
+		ctx := context.Background()
+		ctx = metadata.NewContext(ctx, map[string]string{"privateToken": privateToken})
+		subFilePaths, _ := app.configure.Get().GetSubFilePaths(ctx)
+		urlSubPaths, timeout, _ := app.configure.Get().GetUrlSubs(ctx)
 
 		fileSub, err := app.fileSub.Get().UpdateFileSub(context.Background(), subFilePaths)
 		if err != nil {
@@ -88,7 +91,6 @@ func subShareHandlerApp(app *app) func(w http.ResponseWriter, _ *http.Request) {
 		if err != nil {
 			app.Logger(context.Background()).Error("failed to get url sub update", "error", err)
 		}
-
 		if len(fileSub) > 0 {
 			if _, err = buf.Write(fileSub); err != nil {
 				app.Logger(context.Background()).Error("failed to write file sub to buffer", "error", err)

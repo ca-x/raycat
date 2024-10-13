@@ -4,10 +4,12 @@ import (
 	"context"
 	"errors"
 	"github.com/ServiceWeaver/weaver"
+	"github.com/ServiceWeaver/weaver/metadata"
 )
 
 var (
 	responseOptionNotConfiguredError   = errors.New("no response option configured")
+	invalidContextError                = errors.New("invalid context")
 	subPublishPathNotConfiguredError   = errors.New("sub publish path not configured")
 	subAuthParamNameNotConfiguredError = errors.New("sub auth param name not configured")
 )
@@ -15,8 +17,8 @@ var (
 var _ subConfigureProvider = (*subConfigure)(nil)
 
 type subConfigureProvider interface {
-	GetSubFilePaths(ctx context.Context, privateSubToken string) ([]string, error)
-	GetUrlSubs(ctx context.Context, privateSubToken string) ([]string, int, error)
+	GetSubFilePaths(ctx context.Context) ([]string, error)
+	GetUrlSubs(ctx context.Context) ([]string, int, error)
 	GetSubPublishPath(ctx context.Context) (string, error)
 	GetSubAuthParamName(ctx context.Context) (string, error)
 	GetResponseOption(ctx context.Context) (*responseOption, error)
@@ -49,16 +51,26 @@ type subConfigure struct {
 	weaver.WithConfig[subConfig]
 }
 
-func (s *subConfigure) GetSubFilePaths(ctx context.Context, privateSubToken string) ([]string, error) {
+func (s *subConfigure) GetSubFilePaths(ctx context.Context) ([]string, error) {
 	config := s.Config()
+	meta, ok := metadata.FromContext(ctx)
+	if !ok {
+		return nil, invalidContextError
+	}
+	privateSubToken := meta["privateToken"]
 	if privateSubToken != config.PrivateSubToken {
 		return config.PublicSubFilePaths, nil
 	}
 	return append(config.PrivateSubFilePaths, config.PublicSubFilePaths...), nil
 }
 
-func (s *subConfigure) GetUrlSubs(ctx context.Context, privateSubToken string) ([]string, int, error) {
+func (s *subConfigure) GetUrlSubs(ctx context.Context) ([]string, int, error) {
 	config := s.Config()
+	meta, ok := metadata.FromContext(ctx)
+	if !ok {
+		return nil, 0, invalidContextError
+	}
+	privateSubToken := meta["privateToken"]
 	if privateSubToken != config.PrivateSubToken {
 		s.Logger(ctx).Info("token check pass")
 		return config.PublicUrlSubs, config.UrlSubFetchTimeoutSeconds, nil

@@ -163,7 +163,7 @@ func (s subConfigureProvider_local_stub) GetSubAuthParamName(ctx context.Context
 	return s.impl.GetSubAuthParamName(ctx)
 }
 
-func (s subConfigureProvider_local_stub) GetSubFilePaths(ctx context.Context, a0 string) (r0 []string, err error) {
+func (s subConfigureProvider_local_stub) GetSubFilePaths(ctx context.Context) (r0 []string, err error) {
 	// Update metrics.
 	begin := s.getSubFilePathsMetrics.Begin()
 	defer func() { s.getSubFilePathsMetrics.End(begin, err != nil, 0, 0) }()
@@ -180,7 +180,7 @@ func (s subConfigureProvider_local_stub) GetSubFilePaths(ctx context.Context, a0
 		}()
 	}
 
-	return s.impl.GetSubFilePaths(ctx, a0)
+	return s.impl.GetSubFilePaths(ctx)
 }
 
 func (s subConfigureProvider_local_stub) GetSubPublishPath(ctx context.Context) (r0 string, err error) {
@@ -203,7 +203,7 @@ func (s subConfigureProvider_local_stub) GetSubPublishPath(ctx context.Context) 
 	return s.impl.GetSubPublishPath(ctx)
 }
 
-func (s subConfigureProvider_local_stub) GetUrlSubs(ctx context.Context, a0 string) (r0 []string, r1 int, err error) {
+func (s subConfigureProvider_local_stub) GetUrlSubs(ctx context.Context) (r0 []string, r1 int, err error) {
 	// Update metrics.
 	begin := s.getUrlSubsMetrics.Begin()
 	defer func() { s.getUrlSubsMetrics.End(begin, err != nil, 0, 0) }()
@@ -220,7 +220,7 @@ func (s subConfigureProvider_local_stub) GetUrlSubs(ctx context.Context, a0 stri
 		}()
 	}
 
-	return s.impl.GetUrlSubs(ctx, a0)
+	return s.impl.GetUrlSubs(ctx)
 }
 
 type subFileSourceProvider_local_stub struct {
@@ -396,7 +396,7 @@ func (s subConfigureProvider_client_stub) GetSubAuthParamName(ctx context.Contex
 	return
 }
 
-func (s subConfigureProvider_client_stub) GetSubFilePaths(ctx context.Context, a0 string) (r0 []string, err error) {
+func (s subConfigureProvider_client_stub) GetSubFilePaths(ctx context.Context) (r0 []string, err error) {
 	// Update metrics.
 	var requestBytes, replyBytes int
 	begin := s.getSubFilePathsMetrics.Begin()
@@ -425,20 +425,11 @@ func (s subConfigureProvider_client_stub) GetSubFilePaths(ctx context.Context, a
 
 	}()
 
-	// Preallocate a buffer of the right size.
-	size := 0
-	size += (4 + len(a0))
-	enc := codegen.NewEncoder()
-	enc.Reset(size)
-
-	// Encode arguments.
-	enc.String(a0)
 	var shardKey uint64
 
 	// Call the remote method.
-	requestBytes = len(enc.Data())
 	var results []byte
-	results, err = s.stub.Run(ctx, 2, enc.Data(), shardKey)
+	results, err = s.stub.Run(ctx, 2, nil, shardKey)
 	replyBytes = len(results)
 	if err != nil {
 		err = errors.Join(weaver.RemoteCallError, err)
@@ -499,7 +490,7 @@ func (s subConfigureProvider_client_stub) GetSubPublishPath(ctx context.Context)
 	return
 }
 
-func (s subConfigureProvider_client_stub) GetUrlSubs(ctx context.Context, a0 string) (r0 []string, r1 int, err error) {
+func (s subConfigureProvider_client_stub) GetUrlSubs(ctx context.Context) (r0 []string, r1 int, err error) {
 	// Update metrics.
 	var requestBytes, replyBytes int
 	begin := s.getUrlSubsMetrics.Begin()
@@ -528,20 +519,11 @@ func (s subConfigureProvider_client_stub) GetUrlSubs(ctx context.Context, a0 str
 
 	}()
 
-	// Preallocate a buffer of the right size.
-	size := 0
-	size += (4 + len(a0))
-	enc := codegen.NewEncoder()
-	enc.Reset(size)
-
-	// Encode arguments.
-	enc.String(a0)
 	var shardKey uint64
 
 	// Call the remote method.
-	requestBytes = len(enc.Data())
 	var results []byte
-	results, err = s.stub.Run(ctx, 4, enc.Data(), shardKey)
+	results, err = s.stub.Run(ctx, 4, nil, shardKey)
 	replyBytes = len(results)
 	if err != nil {
 		err = errors.Join(weaver.RemoteCallError, err)
@@ -790,15 +772,10 @@ func (s subConfigureProvider_server_stub) getSubFilePaths(ctx context.Context, a
 		}
 	}()
 
-	// Decode arguments.
-	dec := codegen.NewDecoder(args)
-	var a0 string
-	a0 = dec.String()
-
 	// TODO(rgrandl): The deferred function above will recover from panics in the
 	// user code: fix this.
 	// Call the local method.
-	r0, appErr := s.impl.GetSubFilePaths(ctx, a0)
+	r0, appErr := s.impl.GetSubFilePaths(ctx)
 
 	// Encode the results.
 	enc := codegen.NewEncoder()
@@ -835,15 +812,10 @@ func (s subConfigureProvider_server_stub) getUrlSubs(ctx context.Context, args [
 		}
 	}()
 
-	// Decode arguments.
-	dec := codegen.NewDecoder(args)
-	var a0 string
-	a0 = dec.String()
-
 	// TODO(rgrandl): The deferred function above will recover from panics in the
 	// user code: fix this.
 	// Call the local method.
-	r0, r1, appErr := s.impl.GetUrlSubs(ctx, a0)
+	r0, r1, appErr := s.impl.GetUrlSubs(ctx)
 
 	// Encode the results.
 	enc := codegen.NewEncoder()
@@ -967,8 +939,8 @@ func (s subConfigureProvider_reflect_stub) GetSubAuthParamName(ctx context.Conte
 	return
 }
 
-func (s subConfigureProvider_reflect_stub) GetSubFilePaths(ctx context.Context, a0 string) (r0 []string, err error) {
-	err = s.caller("GetSubFilePaths", ctx, []any{a0}, []any{&r0})
+func (s subConfigureProvider_reflect_stub) GetSubFilePaths(ctx context.Context) (r0 []string, err error) {
+	err = s.caller("GetSubFilePaths", ctx, []any{}, []any{&r0})
 	return
 }
 
@@ -977,8 +949,8 @@ func (s subConfigureProvider_reflect_stub) GetSubPublishPath(ctx context.Context
 	return
 }
 
-func (s subConfigureProvider_reflect_stub) GetUrlSubs(ctx context.Context, a0 string) (r0 []string, r1 int, err error) {
-	err = s.caller("GetUrlSubs", ctx, []any{a0}, []any{&r0, &r1})
+func (s subConfigureProvider_reflect_stub) GetUrlSubs(ctx context.Context) (r0 []string, r1 int, err error) {
+	err = s.caller("GetUrlSubs", ctx, []any{}, []any{&r0, &r1})
 	return
 }
 
