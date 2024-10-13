@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Running Stats</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            background-color: #f5f5f7;
+            color: #1d1d1f;
+            line-height: 1.5;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 18px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        h1 {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .stat-group {
+            margin-bottom: 30px;
+        }
+        .stat-group h2 {
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 15px;
+            color: #1d1d1f;
+        }
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f5f5f7;
+            border-radius: 8px;
+        }
+        .stat-label {
+            font-weight: 500;
+        }
+        .stat-value {
+            font-weight: 400;
+            color: #06c;
+        }
+        .gc-pause {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .gc-pause-item {
+            background-color: #e8e8ed;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Current Program Stats</h1>
+
+        <div class="stat-group">
+            <h2>System Info</h2>
+            <div class="stat-item">
+                <span class="stat-label">Go Version:</span>
+                <span class="stat-value">{{.go_version}}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">OS:</span>
+                <span class="stat-value">{{.go_os}}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Architecture:</span>
+                <span class="stat-value">{{.go_arch}}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">CPU Cores:</span>
+                <span class="stat-value">{{.cpu_num}}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">GOMAXPROCS:</span>
+                <span class="stat-value">{{.gomaxprocs}}</span>
+            </div>
+        </div>
+
+        <div class="stat-group">
+            <h2>Runtime Stats</h2>
+            <div class="stat-item">
+                <span class="stat-label">Goroutines:</span>
+                <span class="stat-value">{{.goroutine_num}}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Cgo Calls:</span>
+                <span class="stat-value">{{.cgo_call_num}}</span>
+            </div>
+        </div>
+
+        <div class="stat-group">
+            <h2>Memory Usage</h2>
+            <div class="stat-item">
+                <span class="stat-label">Alloc:</span>
+                <span class="stat-value">{{.memory_alloc}} bytes</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Total Alloc:</span>
+                <span class="stat-value">{{.memory_total_alloc}} bytes</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Sys:</span>
+                <span class="stat-value">{{.memory_sys}} bytes</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Lookups:</span>
+                <span class="stat-value">{{.memory_lookups}}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Mallocs:</span>
+                <span class="stat-value">{{.memory_mallocs}}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Frees:</span>
+                <span class="stat-value">{{.memory_frees}}</span>
+            </div>
+        </div>
+
+        <div class="stat-group">
+            <h2>Heap Stats</h2>
+            <div class="stat-item">
+                <span class="stat-label">Heap Alloc:</span>
+                <span class="stat-value">{{.heap_alloc}} bytes</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Heap Sys:</span>
+                <span class="stat-value">{{.heap_sys}} bytes</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Heap Idle:</span>
+                <span class="stat-value">{{.heap_idle}} bytes</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Heap In Use:</span>
+                <span class="stat-value">{{.heap_inuse}} bytes</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Heap Released:</span>
+                <span class="stat-value">{{.heap_released}} bytes</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Heap Objects:</span>
+                <span class="stat-value">{{.heap_objects}}</span>
+            </div>
+        </div>
+
+        <div class="stat-group">
+            <h2>Garbage Collection</h2>
+            <div class="stat-item">
+                <span class="stat-label">Next GC:</span>
+                <span class="stat-value">{{.gc_next}} bytes</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Last GC:</span>
+                <span class="stat-value">{{.gc_last}}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">GC Num:</span>
+                <span class="stat-value">{{.gc_num}}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">GC Per Second:</span>
+                <span class="stat-value">{{.gc_per_second}}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">GC Pause Per Second:</span>
+                <span class="stat-value">{{.gc_pause_per_second}}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">GC Pause:</span>
+                <div class="gc-pause">
+                    {{range .gc_pause}}
+                    <span class="gc-pause-item">{{.}} ms</span>
+                    {{end}}
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
