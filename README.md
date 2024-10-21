@@ -5,5 +5,5 @@ your network proxy joiner
 run
 
 ```bash
-SERVICEWEAVER_CONFIG=/opt/raycat/production.toml HOME=/root ./raycat
+SERVICEWEAVER_CONFIG=weaver.toml HOME=/root ./raycat
 ```
