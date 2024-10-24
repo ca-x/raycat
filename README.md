@@ -12,3 +12,6 @@ or use weaver
 weaver multi deploy weaver.toml
 ```
 > to follow the log ,run `weaver multi logs --follow`
+
+### other tools
++ https://github.com/snakem982/Pandora-Box/
