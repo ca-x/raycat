@@ -1,9 +1,13 @@
 package readkit
 
 import (
+	"bytes"
 	"os"
 	"path/filepath"
+	"raycat/internal/pkg/tinypool"
 )
+
+var contentPool = tinypool.New[bytes.Buffer](tinypool.BufReset)
 
 // ReadAll read all data to []byte in a path
 func ReadAll(path string) ([]byte, error) {
@@ -21,7 +25,8 @@ func ReadAll(path string) ([]byte, error) {
 
 // readDirRecursively reads a directory and its subdirectories recursively
 func readDirRecursively(dirPath string) ([]byte, error) {
-	var allContent []byte
+	allContent := contentPool.Get()
+	defer contentPool.Free(allContent)
 	entries, err := os.ReadDir(dirPath)
 	if err != nil {
 		return nil, err
@@ -34,16 +39,16 @@ func readDirRecursively(dirPath string) ([]byte, error) {
 			if err != nil {
 				return nil, err
 			}
-			allContent = append(allContent, subContent...)
+			allContent.Write(subContent)
 		} else {
 			if entry.Type().IsRegular() {
 				content, err := os.ReadFile(fullPath)
 				if err != nil {
 					return nil, err
 				}
-				allContent = append(allContent, content...)
+				allContent.Write(content)
 			}
 		}
 	}
-	return allContent, nil
+	return allContent.Bytes(), nil
 }
