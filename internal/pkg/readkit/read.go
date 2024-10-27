@@ -42,11 +42,16 @@ func readDirRecursively(dirPath string) ([]byte, error) {
 			allContent.Write(subContent)
 		} else {
 			if entry.Type().IsRegular() {
-				content, err := os.ReadFile(fullPath)
+				f, err := os.Open(fullPath)
 				if err != nil {
-					return nil, err
+					continue
 				}
-				allContent.Write(content)
+				_, err = f.WriteTo(allContent)
+				if err != nil {
+					f.Close()
+					continue
+				}
+				f.Close()
 			}
 		}
 	}
